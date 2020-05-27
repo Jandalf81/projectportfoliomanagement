@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	<body>
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Vorgänger</th>          
+				<th>Name</th>               
+				<th>Startdatum</th>         
+				<th>Enddatum</th>           
+<!--				<th>Auftraggeber</th>        -->
+<!--				<th>Projektleiter</th>       -->
+<!--				<th>Mitglieder</th>          -->
+				<th>Priorität</th>
+				<th>Komplexität</th>
+				<th>Status</th>
+				<th>Fortschritt</th>
+				<th>UPDATE</th>
+			</tr>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	//print "dbFile: {$ini['dbFile']}";
+	
+	include '_functions.php';
+	
+// TODO: nicht als Tabelle, sondern als DIV darstellen, bringt mehr Layout-Möglichkeiten
+	$db = new SQLite3("{$ini['dbFile']}");
+	
+	$ddPriorität = new DropDownOptions($db, 'SELECT * FROM t_list_priorität ORDER BY id DESC');
+	$ddKomplexität = new DropDownOptions($db, 'SELECT * FROM t_list_komplexität ORDER BY id DESC');
+	$ddStatus = new DropDownOptions($db, 'SELECT * FROM t_list_status ORDER BY id DESC');
+
+// TODO: Inhalte der Dropdown-Listen als Arrays speichern und wiederverwenden -> DONE
+// TODO: Laden der Listen in Funktion auslagern und wiederverwendbar machen -> DONE
+	$resPriorität = $db->query('SELECT * FROM t_list_priorität ORDER BY id');
+	$prioritäten = array();
+	while ($row = $resPriorität->fetchArray(1)) {
+		$prioritäten[] = $row;
+	}
+	
+	$resKomplexität = $db->query('SELECT * FROM t_list_komplexität ORDER BY id');
+	$komplexitäten = array();
+	while ($row = $resKomplexität->fetchArray(1)) {
+		$komplexitäten[] = $row;
+	}
+	
+	$resStati = $db->query('SELECT * FROM t_list_status ORDER BY id');
+	$stati = array();
+	while ($row = $resStati->fetchArray(1)) {
+		$stati[] = $row;
+	}
+	
+	
+	$res = $db->query('SELECT * FROM t_data_projekt ORDER BY id');
+	while ($row = $res->fetchArray()) {
+		print "<tr><form action='update.html' method='POST'>\n";
+		
+		print "<td><input type='text' name='id' value='{$row['id']}' readonly></td>\n";
+		
+		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'></td>\n";
+		print "<td><input type='text' name='name' value='{$row['name']}'></td>\n";
+		
+		print "<td><input type='date' name='startdatum' value={$row['startdatum']}></td>\n";
+		print "<td><input type='date' name='enddatum' value={$row['enddatum']}></td>\n";
+		
+		print "<td><select name='priorität' 'size='1'>\n";
+		$ddPriorität->listOptionsWithSelected($row['fk_priorität']);
+		print "</select></td>\n";
+		
+		print "<td><select name='komplexität' 'size='1'>\n";
+		$ddKomplexität->listOptionsWithSelected($row['fk_komplexität']);
+		print "</select></td>\n";
+		
+		print "<td><select name='status' 'size='1'>\n";
+		$ddStatus->listOptionsWithSelected($row['fk_status']);
+		print "</select></td>\n";
+		
+		print "<td><input type='number' name='fortschritt' min='0' max='100' value={$row['fortschritt']}></td>\n";
+		
+		print "<td><input type='submit' name='update' value='update'></td>\n";
+		print "</form></tr>\n";
+	}
+?>
+		</table>
+	</body>
+</html>

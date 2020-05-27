@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			table, th, td {
+				border-collapse: collapse; 
+				border:1px solid black; 
+				padding: 10px
+			}
+			.tableHeader, th {
+				color: #FFFFFF;
+				background-color: #0099d4
+			}
+			tr:nth-child(even) {
+				background-color: #b2e0f2
+			}
+			tr:hover {
+				background-color: #40b3df
+			}
+			.headerCell {
+			
+			}
+			.tableCell {
+				
+			}
+			.selectedRow {
+				background-color: #f00 !important
+			}
+		</style> 
+
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript">
+			var mainData;
+			
+			var table;
+			var gantt_chart;
+			
+			google.charts.load('current', {'packages':['table', 'gantt', 'treemap'], 'language': 'de'});
+	
+			google.charts.setOnLoadCallback(loadMainData);
+			
+			google.charts.setOnLoadCallback(drawTableChart);
+			google.charts.setOnLoadCallback(drawGanttChart);
+			google.charts.setOnLoadCallback(drawTreeChart);
+
+			function loadMainData() {
+				mainData = new google.visualization.DataTable();
+				
+				mainData.addColumn('string', 'id');					// 0
+				mainData.addColumn('string', 'vorgänger');          // 1
+				mainData.addColumn('string', 'name');               // 2
+				mainData.addColumn('string', 'startdatum');         // 3
+				mainData.addColumn('string', 'enddatum');           // 4
+				mainData.addColumn('date', 'startdatum_date');      // 5
+				mainData.addColumn('date', 'enddatum_date');        // 6
+				mainData.addColumn('number', 'dauer');        		// 7
+				mainData.addColumn('string', 'auftraggeber');       // 8
+				mainData.addColumn('string', 'projektleiter');      // 9
+				mainData.addColumn('string', 'mitglieder');         // 10
+				mainData.addColumn('string', 'priorität');          // 11
+				mainData.addColumn('string', 'komplexität');        // 12
+				mainData.addColumn('string', 'status');             // 13
+				mainData.addColumn('number', 'fortschritt');        // 14
+				
+				
+				console.log('mainData columns: ' + mainData.getNumberOfColumns());
+				
+				mainData.addRows([
+<?php
+	$ini = parse_ini_file('ppm.ini');
+
+	$db = new SQLite3("{$ini['dbFile']}");
+	
+	$res = $db->query('SELECT * FROM v_ppm_php');
+	
+	while ($row = $res->fetchArray()) {
+		// return DATE if set, else NULL
+		if ($row['startdatum_php'] != '') {
+			$startdate = "new Date({$row['startdatum_php']})";
+		} else {
+			$startdate = null;
+		}
+		if ($row['enddatum_php'] != '') {
+			$enddate = "new Date({$row['enddatum_php']})";
+		} else {
+			$enddate = null;
+		}
+		
+		// add row to mainData
+		echo "['{$row['id']}', '{$row['vorgänger']}', '{$row['name']}', '{$row['startdatum']}', '{$row['enddatum']}', {$startdate}, {$enddate}, {$row['dauer']}, '{$row['auftraggeber']}', '{$row['projektleiter']}', '{$row['mitglieder']}', '{$row['priorität']}', '{$row['komplexität']}', '{$row['status']}', {$row['fortschritt']}],\n";
+	}
+?>
+				]);
+				
+				console.log('mainData rows: ' + mainData.getNumberOfRows());
+				
+				// apply formatting
+				var format_percent = new google.visualization.NumberFormat({suffix: '%', fractionDigits: 0});
+				format_percent.format(mainData, 14);
+				
+				var format_datenbalken = new google.visualization.BarFormat({width: 100, min: 0, max: 100, showValue: true, colorPositive: 'green'});
+				format_datenbalken.format(mainData, 14);
+			}
+						
+			function drawTableChart() {
+				var viewTable = new google.visualization.DataView(mainData)
+				viewTable.setColumns([0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+
+
+				table = new google.visualization.Table(document.getElementById('table_chart_div'));
+
+//				google.visualization.events.addListener(table, 'select', function() 
+//				{
+//					var selection = table.getSelection();
+//					if (selection.length > 0) {
+//						console.log('Table Entry selected: ' + mainData.getValue(selection[0].row, 0));
+//						gantt_chart.setSelection(null);
+//						gantt_chart.setSelection(selection);
+//					} else {
+//						gantt_chart.setSelection(null);
+//					}
+//				});
+				
+				var options = {
+					allowHtml: true,
+					showRowNumber: true,
+					width: '100%',
+					height: '100%',
+					cssClassNames: {
+						headerRow: 'tableHeader',
+						headerCell: 'headerCell',
+						tableCell: 'tableCell',
+						selectedTableRow: 'selectedRow'
+					}
+				};
+				
+				table.draw(viewTable, options);
+			}
+		
+			function daysToMilliseconds(days) {
+				return days * 24 * 60 * 60 * 1000;
+			}
+
+
+			function drawGanttChart() {	
+				// 0: 	string	 	Task ID
+				// 1: 	string	 	Task Name
+				// 2: 	string	 	Resource
+				// 3: 	date 		Start Date
+				// 4: 	date 		End Date
+				// 5: 	number	 	Duration (ms)
+				// 6: 	number	 	Complete (%)
+				// 7: 	string	 	Dependencies
+			
+				// create view on mainData
+				var viewGantt = new google.visualization.DataView(mainData);
+				// filter rows from mainData in view
+				viewGantt.setRows(mainData.getFilteredRows([
+					{column: 7, minValue: 1}
+				]));
+				// filter columns from mainData in view
+				viewGantt.setColumns([0, 2, 9, 5, 6, 7, 14, 1]);
+				
+				var options = {
+					height: 500,
+					// width: 1900,
+					gantt: {
+						defaultStartDate: new Date(),
+						criticalPathEnabled: false,
+						shadowEnabled: true,
+						shadowOffset: 5,
+						shadowColor: 'pink',
+						arrow: {
+							width: 4,
+							lenght: 12
+						}
+					}
+				};
+
+				gantt_chart = new google.visualization.Gantt(document.getElementById('gantt_chart_div'));
+
+//				google.visualization.events.addListener(gantt_chart, 'select', function() 
+//				{
+//					var selection = gantt_chart.getSelection();
+//					if (selection.length > 0) {
+//						console.log('Chart Entry selected: ' + mainData.getValue(selection[0].row, 0));
+//						table.setSelection(null);
+//						table.setSelection(selection);
+//					} else {
+//						table.setSelection(null);
+//					}
+//				});
+				
+				gantt_chart.draw(viewGantt, options);
+			}
+		
+
+			function drawTreeChart() {
+				var data = new google.visualization.DataTable();
+				data.addColumn('string', 'ID');
+				data.addColumn('string', 'Parent');
+				data.addColumn('number', 'Dauer');
+				data.addRows([
+					['Projekte', null, 0],
+<?php
+	$db = new SQLite3("{$ini['dbFile']}");
+	
+	$res = $db->query("SELECT DISTINCT projektleiter FROM v_ppm WHERE status IN ('eingeplant', 'in Arbeit')");
+	while ($row = $res->fetchArray()) {
+		echo "['{$row['projektleiter']}', 'Projekte', null],\n";
+	}
+	
+	$res = $db->query("SELECT name, projektleiter, dauer FROM v_ppm_php WHERE status IN ('eingeplant', 'in Arbeit')");
+	while ($row = $res->fetchArray()) {
+		echo "['{$row['name']}', '{$row['projektleiter']}', {$row['dauer']}],\n";
+	}
+?>					
+				]);
+
+				tree = new google.visualization.TreeMap(document.getElementById('tree_chart_div'));
+				
+				var options = {
+					height: 500,
+					highlightOnMouseOver: true,
+					minColor: '#f00',
+					midColor: '#ddd',
+					maxColor: '#0d0',
+					headerHeight: 15,
+					fontColor: 'black',
+					showScale: true,
+					maxDepth: 1, 		// direkt angezeigte Unterebenen
+					maxPostDepth: 3		// angedeutete Unterebenen
+				};
+
+				tree.draw(data, options);
+			}
+		</script>
+	</head>
+	<body>
+<?php
+	print "dbFile: {$ini['dbFile']}<br />\n";
+?>
+		Normale HTML-Tabelle<br />
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Vorgänger</th>
+				<th>Name</th>
+				<th>Startdatum</th>
+				<th>Enddatum</th>
+				<th>Auftraggeber</th>
+				<th>Projektleiter</th>
+				<th>Mitglieder</th>
+				<th>Priorität</th>
+				<th>Komplexität</th>
+				<th>Status</th>
+				<th>Fortschritt</th>
+			</tr>
+<?php
+	$db = new SQLite3("{$ini['dbFile']}");
+	
+	//$db->exec("CREATE TABLE ppm (id INTEGER PRIMARY KEY, name TEXT)");
+	//$db->exec("INSERT INTO ppm (name) VALUES ('projekt1')");
+	
+	$res = $db->query('SELECT * FROM v_ppm');
+	
+	while ($row = $res->fetchArray()) {
+		echo "<tr>";
+		echo "<td>{$row['id']}</td><td>{$row['vorgänger']}</td><td>{$row['name']}</td><td>{$row['startdatum']}</td><td>{$row['enddatum']}</td><td>{$row['auftraggeber']}</td><td>{$row['projektleiter']}</td><td>{$row['mitglieder']}</td><td>{$row['priorität']}</td><td>{$row['komplexität']}</td><td>{$row['status']}</td><td>{$row['fortschritt']}</td>";
+		echo "</tr>\n";
+	}
+?>
+		</table>
+		<br />
+		Google Charts Table (alle Projekte)<br />
+		<div id="table_chart_div"></div>
+		<br />
+		Google Charts Timeline (Projekte "eingeplant" oder "in Arbeit")<br />
+		<div id="gantt_chart_div"></div>
+		<br />
+		Google Charts Tree (Anzahl und Dauer der Projekte nach Projektleiter)<br />
+		<div id="tree_chart_div"></div>
+	</body>
+</html>

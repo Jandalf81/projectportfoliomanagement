@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	<body>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	print "dbFile: {$ini['dbFile']}<br />\n";
+		
+	$id = $_POST['id'];
+	$vorgänger = $_POST['vorgänger'];
+	$name = $_POST['name'];
+	$startdatum = $_POST['startdatum'];
+	$enddatum = $_POST['enddatum'];
+	$priorität = $_POST['priorität'];
+	$komplexität = $_POST['komplexität'];
+	$status = $_POST['status'];
+	$fortschritt = $_POST['fortschritt'];
+
+	print "ID: {$id}<br />\n";
+	print "Vorgänger: {$vorgänger}<br />\n";
+	print "Name: {$name}<br />\n";
+	print "Startdatum: {$startdatum}<br />\n";
+	print "Enddatum: {$enddatum}<br />\n";
+	print "Priorität: {$priorität}<br />\n";
+	print "Komplexität: {$komplexität}<br />\n";
+	print "Status: {$status}<br />\n";
+	print "Fortschritt: {$fortschritt}<br />\n";
+
+	$db =  new SQLite3("{$ini['dbFile']}");
+
+	try {
+		$stmt = $db->prepare('UPDATE t_data_projekt SET ' .
+			'vorgänger = :vorgänger, ' .
+			'name = :name, ' .
+			'startdatum = :startdatum, ' .
+			'enddatum = :enddatum, ' .
+			'priorität = :priorität, ' .
+			'komplexität = :komplexität, ' .
+			'status = :status, ' .
+			'fortschritt = :fortschritt ' .
+			'WHERE id = :id');
+		$stmt->bindParam(':id', $id);
+		$stmt->bindParam(':vorgänger', $vorgänger);
+		$stmt->bindParam(':name', $name);
+		$stmt->bindParam(':startdatum', $startdatum);
+		$stmt->bindParam(':enddatum', $enddatum);
+		$stmt->bindParam(':priorität', $priorität);
+		$stmt->bindParam(':komplexität', $komplexität);
+		$stmt->bindParam(':status', $status);
+		$stmt->bindParam(':fortschritt', $fortschritt);
+		
+		$stmt->execute();
+	}	
+	catch(Exception $e) {
+		print "Error!<br />";
+		print $e->getMessage();
+	}
+
+	print "Success!<br />\n";
+?>
+	<br />
+	<a href='ppm_admin.html'>Zurück</a>
+	</body>
+</html>
