@@ -1,0 +1,24 @@
+table, th, td {
+	border-collapse: collapse; 
+	border:1px solid black; 
+	padding: 10px
+}
+.tableHeader, th {
+	color: #FFFFFF;
+	background-color: #0099d4
+}
+tr:nth-child(even) {
+	background-color: #b2e0f2
+}
+tr:hover {
+	background-color: #40b3df
+}
+.headerCell {
+
+}
+.tableCell {
+	
+}
+.selectedRow {
+	background-color: #f00 !important
+}

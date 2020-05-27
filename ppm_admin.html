@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="stylesheet" href="ppm.css">
 	</head>
 	<body>
 		<table>
@@ -65,15 +66,15 @@
 		print "<td><input type='date' name='startdatum' value={$row['startdatum']}></td>\n";
 		print "<td><input type='date' name='enddatum' value={$row['enddatum']}></td>\n";
 		
-		print "<td><select name='priorität' 'size='1'>\n";
+		print "<td><select name='fk_priorität' 'size='1'>\n";
 		$ddPriorität->listOptionsWithSelected($row['fk_priorität']);
 		print "</select></td>\n";
 		
-		print "<td><select name='komplexität' 'size='1'>\n";
+		print "<td><select name='fk_komplexität' 'size='1'>\n";
 		$ddKomplexität->listOptionsWithSelected($row['fk_komplexität']);
 		print "</select></td>\n";
 		
-		print "<td><select name='status' 'size='1'>\n";
+		print "<td><select name='fk_status' 'size='1'>\n";
 		$ddStatus->listOptionsWithSelected($row['fk_status']);
 		print "</select></td>\n";
 		

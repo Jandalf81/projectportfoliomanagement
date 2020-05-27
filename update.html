@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<link rel="stylesheet" href="ppm.css">
 	</head>
 	<body>
 <?php
@@ -12,20 +13,22 @@
 	$name = $_POST['name'];
 	$startdatum = $_POST['startdatum'];
 	$enddatum = $_POST['enddatum'];
-	$priorität = $_POST['priorität'];
-	$komplexität = $_POST['komplexität'];
-	$status = $_POST['status'];
+	$fk_priorität = $_POST['fk_priorität'];
+	$fk_komplexität = $_POST['fk_komplexität'];
+	$fk_status = $_POST['fk_status'];
 	$fortschritt = $_POST['fortschritt'];
 
-	print "ID: {$id}<br />\n";
-	print "Vorgänger: {$vorgänger}<br />\n";
-	print "Name: {$name}<br />\n";
-	print "Startdatum: {$startdatum}<br />\n";
-	print "Enddatum: {$enddatum}<br />\n";
-	print "Priorität: {$priorität}<br />\n";
-	print "Komplexität: {$komplexität}<br />\n";
-	print "Status: {$status}<br />\n";
-	print "Fortschritt: {$fortschritt}<br />\n";
+	print "<table><tr><th>Attribut</th><th>Wert</th></tr>";
+	print "<tr><td>ID</td><td>{$id}</td></tr>\n";
+	print "<tr><td>Vorgänger</td><td>{$vorgänger}</td></tr>\n";
+	print "<tr><td>Name</td><td>{$name}</td></tr>\n";
+	print "<tr><td>Startdatum</td><td>{$startdatum}</td></tr>\n";
+	print "<tr><td>Enddatum</td><td>{$enddatum}</td></tr>\n";
+	print "<tr><td>Priorität</td><td>{$fk_priorität}</td></tr>\n";
+	print "<tr><td>Komplexität</td><td>{$fk_komplexität}</td></tr>\n";
+	print "<tr><td>Status</td><td>{$fk_status}</td></tr>\n";
+	print "<tr><td>Fortschritt</td><td>{$fortschritt}</td></tr>\n";
+	print "</table>";
 
 	$db =  new SQLite3("{$ini['dbFile']}");
 
@@ -35,9 +38,9 @@
 			'name = :name, ' .
 			'startdatum = :startdatum, ' .
 			'enddatum = :enddatum, ' .
-			'priorität = :priorität, ' .
-			'komplexität = :komplexität, ' .
-			'status = :status, ' .
+			'fk_priorität = :fk_priorität, ' .
+			'fk_komplexität = :fk_komplexität, ' .
+			'fk_status = :fk_status, ' .
 			'fortschritt = :fortschritt ' .
 			'WHERE id = :id');
 		$stmt->bindParam(':id', $id);
@@ -45,9 +48,9 @@
 		$stmt->bindParam(':name', $name);
 		$stmt->bindParam(':startdatum', $startdatum);
 		$stmt->bindParam(':enddatum', $enddatum);
-		$stmt->bindParam(':priorität', $priorität);
-		$stmt->bindParam(':komplexität', $komplexität);
-		$stmt->bindParam(':status', $status);
+		$stmt->bindParam(':fk_priorität', $fk_priorität);
+		$stmt->bindParam(':fk_komplexität', $fk_komplexität);
+		$stmt->bindParam(':fk_status', $fk_status);
 		$stmt->bindParam(':fortschritt', $fortschritt);
 		
 		$stmt->execute();
