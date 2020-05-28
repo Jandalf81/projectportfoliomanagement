@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="ppm.css">
+	</head>
+	<body>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	print "dbFile: {$ini['dbFile']}<br />\n";
+	
+	$todo = $_POST['todo'];
+	if (isset($_POST['id'])) {
+		$id = $_POST['id'];
+	} else {
+		$id = 0;
+	};
+	$vorgänger = $_POST['vorgänger'];
+	$name = $_POST['name'];
+	$startdatum = $_POST['startdatum'];
+	$enddatum = $_POST['enddatum'];
+	$fk_priorität = $_POST['fk_priorität'];
+	$fk_komplexität = $_POST['fk_komplexität'];
+	$fk_status = $_POST['fk_status'];
+	$fortschritt = $_POST['fortschritt'];
+
+	
+
+	$db =  new SQLite3("{$ini['dbFile']}");
+
+	try {
+		if ($todo == 'insert') {
+			print "INSERT";
+			
+			$stmt = $db->prepare('INSERT INTO t_data_projekt (name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt) VALUES ' .
+				'(:name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt)');
+			$stmt->bindParam(':name', $name);
+			$stmt->bindParam(':startdatum', $startdatum);
+			$stmt->bindParam(':enddatum', $enddatum);
+			$stmt->bindParam(':fk_priorität', $fk_priorität);
+			$stmt->bindParam(':fk_komplexität', $fk_komplexität);
+			$stmt->bindParam(':fk_status', $fk_status);
+			$stmt->bindParam(':fortschritt', $fortschritt);
+		}
+		
+		if ($todo == 'update') {
+			print "<table><tr><th>Attribut</th><th>Wert</th></tr>";
+			print "<tr><td>ID</td><td>{$id}</td></tr>\n";
+			print "<tr><td>Vorgänger</td><td>{$vorgänger}</td></tr>\n";
+			print "<tr><td>Name</td><td>{$name}</td></tr>\n";
+			print "<tr><td>Startdatum</td><td>{$startdatum}</td></tr>\n";
+			print "<tr><td>Enddatum</td><td>{$enddatum}</td></tr>\n";
+			print "<tr><td>Priorität</td><td>{$fk_priorität}</td></tr>\n";
+			print "<tr><td>Komplexität</td><td>{$fk_komplexität}</td></tr>\n";
+			print "<tr><td>Status</td><td>{$fk_status}</td></tr>\n";
+			print "<tr><td>Fortschritt</td><td>{$fortschritt}</td></tr>\n";
+			print "</table>";
+		
+			$stmt = $db->prepare('UPDATE t_data_projekt SET ' .
+				'vorgänger = :vorgänger, ' .
+				'name = :name, ' .
+				'startdatum = :startdatum, ' .
+				'enddatum = :enddatum, ' .
+				'fk_priorität = :fk_priorität, ' .
+				'fk_komplexität = :fk_komplexität, ' .
+				'fk_status = :fk_status, ' .
+				'fortschritt = :fortschritt ' .
+				'WHERE id = :id');
+			$stmt->bindParam(':id', $id);
+			$stmt->bindParam(':vorgänger', $vorgänger);
+			$stmt->bindParam(':name', $name);
+			$stmt->bindParam(':startdatum', $startdatum);
+			$stmt->bindParam(':enddatum', $enddatum);
+			$stmt->bindParam(':fk_priorität', $fk_priorität);
+			$stmt->bindParam(':fk_komplexität', $fk_komplexität);
+			$stmt->bindParam(':fk_status', $fk_status);
+			$stmt->bindParam(':fortschritt', $fortschritt);
+		}
+		
+		$stmt->execute();
+	}	
+	catch(Exception $e) {
+		print "Error!<br />";
+		print $e->getMessage();
+	}
+
+	print "Success!<br />\n";
+?>
+	<br />
+	<a href='ppm_admin.html'>Zurück</a>
+	</body>
+</html>
