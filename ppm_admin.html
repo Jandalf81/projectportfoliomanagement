@@ -1,9 +1,63 @@
 <!DOCTYPE html>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	//print "dbFile: {$ini['dbFile']}";
+	
+	include '_functions.php';
+	
+// TODO: nicht als Tabelle, sondern als DIV darstellen, bringt mehr Layout-Möglichkeiten
+	$db = new SQLite3("{$ini['dbFile']}");
+	
+	$ddPriorität = new DropDownOptions($db, 'SELECT * FROM t_list_priorität ORDER BY id DESC');
+	$ddKomplexität = new DropDownOptions($db, 'SELECT * FROM t_list_komplexität ORDER BY id DESC');
+	$ddStatus = new DropDownOptions($db, 'SELECT * FROM t_list_status ORDER BY id ASC');
+?>
 <html>
 	<head>
 		<link rel="stylesheet" href="ppm.css">
 	</head>
 	<body>
+		<details>
+			<summary>Neues Projekt anlegen</summary>
+			<table>
+				<tr>
+					<th>Vorgänger</th>          
+					<th>Name</th>               
+					<th>Startdatum</th>         
+					<th>Enddatum</th>
+					<th>Priorität</th>
+					<th>Komplexität</th>
+					<th>Status</th>
+					<th>Fortschritt</th>
+					<th>ANLEGEN</th>
+				</tr>
+				<tr>
+					<form action="updateProjekt.html" method="POST">
+						<td><input type="hidden" name="todo" value="insert"><input type="text" name="vorgänger"></td>
+						<td><input type="text" name="name" required></td>
+						<td><input type="date" name="startdatum"></td>
+						<td><input type="date" name="enddatum"></td>
+						<td><select name='fk_priorität' 'size='1' required>
+							<option value="" disabled selected>bitte auswählen</option>
+							<?php $ddPriorität->listOptions() ?>
+						</select></td>
+						<td><select name='fk_komplexität' 'size='1' required>
+							<option value="" disabled selected>bitte auswählen</option>
+							<?php $ddKomplexität->listOptions() ?>
+						</select></td>
+						<td><select name='fk_status' 'size='1' required>
+							<option value="" disabled selected>bitte auswählen</option>
+							<?php $ddStatus->listOptions() ?>
+						</select></td>
+						<td><input type='number' name='fortschritt' min='0' max='100' value="0"></td>
+						<td><input type='submit' name='save' value='anlegen'></td>
+					</form>
+				</tr>
+			</table>
+		</details>
+		
+		
+		<h2>Bestehende Projekte aktualisieren</h2>
 		<table>
 			<tr>
 				<th>ID</th>
@@ -20,45 +74,16 @@
 				<th>Fortschritt</th>
 				<th>UPDATE</th>
 			</tr>
-<?php
-	$ini = parse_ini_file('ppm.ini');
-	//print "dbFile: {$ini['dbFile']}";
-	
-	include '_functions.php';
-	
-// TODO: nicht als Tabelle, sondern als DIV darstellen, bringt mehr Layout-Möglichkeiten
-	$db = new SQLite3("{$ini['dbFile']}");
-	
-	$ddPriorität = new DropDownOptions($db, 'SELECT * FROM t_list_priorität ORDER BY id DESC');
-	$ddKomplexität = new DropDownOptions($db, 'SELECT * FROM t_list_komplexität ORDER BY id DESC');
-	$ddStatus = new DropDownOptions($db, 'SELECT * FROM t_list_status ORDER BY id DESC');
 
+<?php
 // TODO: Inhalte der Dropdown-Listen als Arrays speichern und wiederverwenden -> DONE
 // TODO: Laden der Listen in Funktion auslagern und wiederverwendbar machen -> DONE
-	$resPriorität = $db->query('SELECT * FROM t_list_priorität ORDER BY id');
-	$prioritäten = array();
-	while ($row = $resPriorität->fetchArray(1)) {
-		$prioritäten[] = $row;
-	}
-	
-	$resKomplexität = $db->query('SELECT * FROM t_list_komplexität ORDER BY id');
-	$komplexitäten = array();
-	while ($row = $resKomplexität->fetchArray(1)) {
-		$komplexitäten[] = $row;
-	}
-	
-	$resStati = $db->query('SELECT * FROM t_list_status ORDER BY id');
-	$stati = array();
-	while ($row = $resStati->fetchArray(1)) {
-		$stati[] = $row;
-	}
-	
 	
 	$res = $db->query('SELECT * FROM t_data_projekt ORDER BY id');
 	while ($row = $res->fetchArray()) {
-		print "<tr><form action='update.html' method='POST'>\n";
+		print "<tr><form action='updateProjekt.html' method='POST'>\n";
 		
-		print "<td><input type='text' name='id' value='{$row['id']}' readonly></td>\n";
+		print "<td><input type='hidden' name='todo' value='update'><input type='text' name='id' value='{$row['id']}' readonly></td>\n";
 		
 		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'></td>\n";
 		print "<td><input type='text' name='name' value='{$row['name']}'></td>\n";

@@ -75,3 +75,17 @@ CREATE TABLE t_list_rolle (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL
 );
+
+CREATE TABLE t_rel_projekt2projekt (
+	id INTEGER PRIMARY KEY,
+	fk_parent INTEGER NOT NULL,
+	fk_sub INTEGER NOT NULL,
+	
+	FOREIGN KEY(fk_parent) REFERENCES t_data_projekt(id),
+	FOREIGN KEY(fk_sub) REFERENCES t_data_projekt(id)
+);
+
+CREATE TABLE t_conf_nummer (
+   jahr INTEGER NOT NULL,
+   lastNumber INTEGER NOT NULL
+);

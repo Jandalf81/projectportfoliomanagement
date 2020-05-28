@@ -31,3 +31,7 @@ INSERT INTO t_data_projekt (vorgänger, name, startdatum, enddatum, fk_prioritä
 (1, '[helpLine] Scope 3b', '2020-03-01', '2020-08-30', 1, 4, 5, 20),
 (2, '[helpLine] Scope 3c', '2020-09-01', '2020-12-31', 1, 3, 4, 0),
 (NULL, '[Applikation] Ablösung inLoox', NULL, NULL, 1, 3, 3, 0)
+
+INSERT INTO t_rel_projekt2projekt (fk_parent, fk_sub) VALUES
+(1, 2),
+(2, 3);

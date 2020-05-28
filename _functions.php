@@ -33,7 +33,7 @@
 		
 		public function listOptions() {
 			foreach ($this->options as $option) {
-				print "<option value='{$option->get_id()}'>{$option->name}</option>\n";
+				print "<option value='{$option->get_id()}'>{$option->get_Name()}</option>\n";
 			}
 		}
 		
