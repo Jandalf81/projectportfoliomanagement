@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="ppm.css">
+	</head>
+	<body>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	$db = new SQLite3("{$ini['dbFile']}");
+	print "dbFile: {$ini['dbFile']}<br />\n";
+	
+	$projektID = $_POST['projektID'];
+	if (isset($_POST['auftraggeber'])) {
+		$auftraggeber = $_POST['auftraggeber'];
+	} else {
+		$auftraggeber = 0;
+	};
+	
+	$rolle = 1;
+	
+	// DEBUG
+	$postData = file_get_contents("php://input");
+	var_dump($postData);
+	
+	foreach($auftraggeber as $item) {
+		// TODO: vor INSERT auf Vorhandensein gleicher Einträge prüfen
+		// TODO: entfernte Assoziationen berücksichtigen
+		
+		//$res = $db->query("SELECT COUNT(*) FROM t_rel_person2projekt WHERE fk_person = {$item} AND fk_projekt = {$projektID} AND fk_rolle = 1");
+		
+		$stmt = $db->prepare('INSERT INTO t_rel_person2projekt (fk_person, fk_projekt, fk_rolle) VALUES (:fk_person, :fk_projekt, :fk_rolle)');
+		$stmt->bindParam(':fk_person', $item);
+		$stmt->bindParam(':fk_projekt', $projektID);
+		$stmt->bindParam(':fk_rolle', $rolle);
+		
+		$stmt->execute();
+	}
+
+?>
+	</body>
+</html>

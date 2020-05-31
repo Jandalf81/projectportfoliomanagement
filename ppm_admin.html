@@ -15,15 +15,36 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="ppm.css">
+		
+		<script type="text/javascript">
+			function updatePerson2Projekt (id) {
+				var form = document.createElement("form");
+				form.method = "POST";
+				form.action = "changePerson2Projekt.html";
+				form.target = "newWindow";
+				
+				var input_id = document.createElement("input");
+				input_id.id = "projektID";
+				input_id.name = "projektID";
+				input_id.type = "hidden";
+				input_id.value = id;
+				form.appendChild(input_id);
+				
+				document.body.appendChild(form);
+				
+				window.open('', 'newWindow', 'location=yes,width=600,height=400');
+				form.submit();
+			}
+		</script>
 	</head>
 	<body>
 		<details>
-			<summary>Neues Projekt anlegen</summary>
+			<summary><img src="./icons/add.png" /> Neues Projekt anlegen</summary>
 			<table>
 				<tr>
-					<th>Vorgänger</th>          
-					<th>Name</th>               
-					<th>Startdatum</th>         
+					<th>Vorgänger</th>
+					<th>Name</th>
+					<th>Startdatum</th>
 					<th>Enddatum</th>
 					<th>Priorität</th>
 					<th>Komplexität</th>
@@ -50,7 +71,7 @@
 							<?php $ddStatus->listOptions() ?>
 						</select></td>
 						<td><input type='number' name='fortschritt' min='0' max='100' value="0"></td>
-						<td><input type='submit' name='save' value='anlegen'></td>
+						<td><input type='submit' name='save' value='anlegen' /></td>
 					</form>
 				</tr>
 			</table>
@@ -61,11 +82,11 @@
 		<table>
 			<tr>
 				<th>ID</th>
-				<th>Vorgänger</th>          
-				<th>Name</th>               
-				<th>Startdatum</th>         
-				<th>Enddatum</th>           
-<!--				<th>Auftraggeber</th>        -->
+				<th>Vorgänger</th>
+				<th>Name</th>
+				<th>Auftraggeber</th>
+				<th>Startdatum</th>
+				<th>Enddatum</th>
 <!--				<th>Projektleiter</th>       -->
 <!--				<th>Mitglieder</th>          -->
 				<th>Priorität</th>
@@ -85,8 +106,9 @@
 		
 		print "<td><input type='hidden' name='todo' value='update'><input type='text' name='id' value='{$row['id']}' readonly></td>\n";
 		
-		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'></td>\n";
+		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'>  <img src='icons/chart_line_edit.png' /></td>\n";
 		print "<td><input type='text' name='name' value='{$row['name']}'></td>\n";
+		print "<td><input type='text' name='auftraggeber' readonly> <img src='icons/user_edit.png' onclick=updatePerson2Projekt({$row['id']}) /></td>\n";
 		
 		print "<td><input type='date' name='startdatum' value={$row['startdatum']}></td>\n";
 		print "<td><input type='date' name='enddatum' value={$row['enddatum']}></td>\n";

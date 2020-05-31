@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="ppm.css">
+		
+		<script type="text/javascript">
+			function addToAuftraggeber() {
+				listPersonenLength = personen.length;
+				
+				for (i = 0; i < listPersonenLength; i++) {
+					if (personen.options[i].selected == true) {
+						listAuftraggeberLength = auftraggeber.length;
+						auftraggeber.options[listAuftraggeberLength] = new Option(personen.options[i].text, personen.options[i].value);
+					}
+				}
+				
+				for (i = (listPersonenLength - 1); i >=0; i--) {
+					if (personen.options[i].selected == true) {
+						personen.options[i] = null;
+					}
+				}
+				
+				sortOptions(auftraggeber);
+			}
+			
+			function removeFromAuftraggeber() {
+				listAuftraggeberLength = auftraggeber.length;
+				
+				for (i = 0; i < listAuftraggeberLength; i++) {
+					if (auftraggeber.options[i].selected == true) {
+						listPersonenLength = personen.length;
+						personen.options[listPersonenLength] = new Option(auftraggeber.options[i].text, auftraggeber.options[i].value);
+					}
+				}
+				
+				for (i = (listAuftraggeberLength - 1); i >=0; i--) {
+					if (auftraggeber.options[i].selected == true) {
+						auftraggeber.options[i] = null;
+					}
+				}
+				
+				sortOptions(personen);
+			}
+			
+			function sortOptions(selElem) {
+				var tmpAry = new Array();
+				for (var i=0;i<selElem.options.length;i++) {
+					tmpAry[i] = new Array();
+					tmpAry[i][0] = selElem.options[i].text;
+					tmpAry[i][1] = selElem.options[i].value;
+				}
+				tmpAry.sort();
+				while (selElem.options.length > 0) {
+					selElem.options[0] = null;
+				}
+				for (var i=0;i<tmpAry.length;i++) {
+					var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+					selElem.options[i] = op;
+				}
+				return;
+			}
+		</script>
+	</head>
+	<body>
+<?php
+	$ini = parse_ini_file('ppm.ini');
+	$db = new SQLite3("{$ini['dbFile']}");
+	print "dbFile: {$ini['dbFile']}<br />\n";
+	
+	// $todo = $_POST['todo'];
+	if (isset($_POST['projektID'])) {
+		$projektID = $_POST['projektID'];
+	} else {
+		$projektID = 0;
+	};
+	
+	print "projektID: {$projektID}\n";
+?>
+		<h2>Setze Auftraggeber für Projekt ID <?php print $projektID; ?></h2>
+		<form action="updatePerson2Projekt.html" method="POST" onsubmit="for (i = 0; i < auftraggeber.length; i++) {auftraggeber.options[i].selected = true;}">
+			<input type="hidden" name="projektID" value="<?php print $projektID; ?>" />
+			<table>
+				<tr>
+					<th>Personen</th>
+					<th>Buttons</th>
+					<th>Auftraggeber</th>
+				</tr>
+				<tr>
+					<td>
+						<select id="personen" name="personen" size=10 multiple>
+<?php
+	$res = $db->query('SELECT * FROM t_data_person ORDER BY nachname, vorname');
+	while ($row = $res->fetchArray()) {
+		print "<option value='{$row['id']}'>{$row['nachname']}</option>\n";
+	}
+?>			
+						</select>
+					</td>
+					<td>
+						<input type="button" onClick="addToAuftraggeber()" value=">>" />
+						<br /><br />
+						<input type="button" onClick="removeFromAuftraggeber()" value="<<" />
+					</td>
+					<td>
+						<select id="auftraggeber" name="auftraggeber[]" size=10 multiple>
+						
+						</select>
+					</td>
+				</tr>
+			</table>
+			<br />
+			<input type="submit" name="save" value="Speichern" />
+		</form>
+	</body>
+</html>

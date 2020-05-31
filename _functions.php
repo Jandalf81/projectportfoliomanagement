@@ -47,4 +47,26 @@
 			}
 		}
 	}
+	
+	class Person {
+		private $id;
+		private $vorname;
+		private $nachname;
+	
+		function get_id() {
+			return $this->id;
+		}
+		
+		function get_Vorname() {
+			return $this->vorname;
+		}
+		
+		function get_Nachname() {
+			return $this->nachname;
+		}
+		
+		function get_Name() {
+			return $this->nachname . ', ' . $this->vorname;
+		}
+	}
 ?>
