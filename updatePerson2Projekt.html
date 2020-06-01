@@ -10,19 +10,19 @@
 	print "dbFile: {$ini['dbFile']}<br />\n";
 	
 	$projektID = $_POST['projektID'];
-	if (isset($_POST['auftraggeber'])) {
-		$auftraggeber = $_POST['auftraggeber'];
+	if (isset($_POST['person2projekt'])) {
+		$person2projekt = $_POST['person2projekt'];
 	} else {
-		$auftraggeber = 0;
+		$person2projekt = 0;
 	};
 	
-	$rolle = 1;
+	$rolle = $_POST['rolleID'];
 	
 	// DEBUG
 	$postData = file_get_contents("php://input");
 	var_dump($postData);
 	
-	foreach($auftraggeber as $item) {
+	foreach($person2projekt as $item) {
 		// TODO: vor INSERT auf Vorhandensein gleicher Einträge prüfen
 		// TODO: entfernte Assoziationen berücksichtigen
 		

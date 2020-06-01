@@ -17,7 +17,7 @@
 		<link rel="stylesheet" href="ppm.css">
 		
 		<script type="text/javascript">
-			function updatePerson2Projekt (id) {
+			function updatePerson2Projekt (projektID, rolleID) {
 				var form = document.createElement("form");
 				form.method = "POST";
 				form.action = "changePerson2Projekt.html";
@@ -27,8 +27,15 @@
 				input_id.id = "projektID";
 				input_id.name = "projektID";
 				input_id.type = "hidden";
-				input_id.value = id;
+				input_id.value = projektID;
 				form.appendChild(input_id);
+				
+				var input_rolle = document.createElement("input");
+				input_rolle.id = "rolleID";
+				input_rolle.name = "rolleID";
+				input_rolle.type = "hidden";
+				input_rolle.value = rolleID;
+				form.appendChild(input_rolle);
 				
 				document.body.appendChild(form);
 				
@@ -108,7 +115,7 @@
 		
 		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'>  <img src='icons/chart_line_edit.png' /></td>\n";
 		print "<td><input type='text' name='name' value='{$row['name']}'></td>\n";
-		print "<td><input type='text' name='auftraggeber' readonly> <img src='icons/user_edit.png' onclick=updatePerson2Projekt({$row['id']}) /></td>\n";
+		print "<td><input type='text' name='auftraggeber' readonly> <img src='icons/user_edit.png' onclick='updatePerson2Projekt({$row['id']}, 1)' /></td>\n";
 		
 		print "<td><input type='date' name='startdatum' value={$row['startdatum']}></td>\n";
 		print "<td><input type='date' name='enddatum' value={$row['enddatum']}></td>\n";

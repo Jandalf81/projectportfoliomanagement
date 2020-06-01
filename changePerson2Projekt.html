@@ -4,13 +4,13 @@
 		<link rel="stylesheet" href="ppm.css">
 		
 		<script type="text/javascript">
-			function addToAuftraggeber() {
+			function addToPerson2Projekt() {
 				listPersonenLength = personen.length;
 				
 				for (i = 0; i < listPersonenLength; i++) {
 					if (personen.options[i].selected == true) {
-						listAuftraggeberLength = auftraggeber.length;
-						auftraggeber.options[listAuftraggeberLength] = new Option(personen.options[i].text, personen.options[i].value);
+						listPerson2ProjektLength = person2projekt.length;
+						person2projekt.options[listPerson2ProjektLength] = new Option(personen.options[i].text, personen.options[i].value);
 					}
 				}
 				
@@ -20,22 +20,22 @@
 					}
 				}
 				
-				sortOptions(auftraggeber);
+				sortOptions(person2projekt);
 			}
 			
-			function removeFromAuftraggeber() {
-				listAuftraggeberLength = auftraggeber.length;
+			function removeFromPerson2Projekt() {
+				listPerson2ProjektLength = person2projekt.length;
 				
-				for (i = 0; i < listAuftraggeberLength; i++) {
-					if (auftraggeber.options[i].selected == true) {
+				for (i = 0; i < listPerson2ProjektLength; i++) {
+					if (person2projekt.options[i].selected == true) {
 						listPersonenLength = personen.length;
-						personen.options[listPersonenLength] = new Option(auftraggeber.options[i].text, auftraggeber.options[i].value);
+						personen.options[listPersonenLength] = new Option(person2projekt.options[i].text, person2projekt.options[i].value);
 					}
 				}
 				
-				for (i = (listAuftraggeberLength - 1); i >=0; i--) {
-					if (auftraggeber.options[i].selected == true) {
-						auftraggeber.options[i] = null;
+				for (i = (listPerson2ProjektLength - 1); i >=0; i--) {
+					if (person2projekt.options[i].selected == true) {
+						person2projekt.options[i] = null;
 					}
 				}
 				
@@ -67,29 +67,36 @@
 	$db = new SQLite3("{$ini['dbFile']}");
 	print "dbFile: {$ini['dbFile']}<br />\n";
 	
-	// $todo = $_POST['todo'];
-	if (isset($_POST['projektID'])) {
-		$projektID = $_POST['projektID'];
-	} else {
-		$projektID = 0;
-	};
+	$projektID = $_POST['projektID'];
+	$rolleID = $_POST['rolleID'];
+	
+	// DEBUG
+	$postData = file_get_contents("php://input");
+	var_dump($postData);
 	
 	print "projektID: {$projektID}\n";
+	print "rolleID: {$rolleID}\n";
+	
+	$res = $db->query("SELECT name FROM t_list_rolle WHERE id = {$rolleID}");
+	while ($row = $res->fetchArray()) {
+		$rolle = $row['name'];
+	}
 ?>
-		<h2>Setze Auftraggeber für Projekt ID <?php print $projektID; ?></h2>
-		<form action="updatePerson2Projekt.html" method="POST" onsubmit="for (i = 0; i < auftraggeber.length; i++) {auftraggeber.options[i].selected = true;}">
+		<h2>Setze <?php print $rolle; ?> für Projekt ID <?php print $projektID; ?></h2>
+		<form action="updatePerson2Projekt.html" method="POST" onsubmit="for (i = 0; i < person2projekt.length; i++) {person2projekt.options[i].selected = true;}">
 			<input type="hidden" name="projektID" value="<?php print $projektID; ?>" />
+			<input type="hidden" name="rolleID" value="<?php print $rolleID; ?>" />
 			<table>
 				<tr>
 					<th>Personen</th>
-					<th>Buttons</th>
-					<th>Auftraggeber</th>
+					<th></th>
+					<th><?php print $rolle; ?></th>
 				</tr>
 				<tr>
 					<td>
 						<select id="personen" name="personen" size=10 multiple>
 <?php
-	$res = $db->query('SELECT * FROM t_data_person ORDER BY nachname, vorname');
+	$res = $db->query("SELECT * FROM t_data_person WHERE id NOT IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
 	while ($row = $res->fetchArray()) {
 		print "<option value='{$row['id']}'>{$row['nachname']}</option>\n";
 	}
@@ -97,13 +104,18 @@
 						</select>
 					</td>
 					<td>
-						<input type="button" onClick="addToAuftraggeber()" value=">>" />
+						<input type="button" onClick="addToPerson2Projekt()" value=">>" />
 						<br /><br />
-						<input type="button" onClick="removeFromAuftraggeber()" value="<<" />
+						<input type="button" onClick="removeFromPerson2Projekt()" value="<<" />
 					</td>
 					<td>
-						<select id="auftraggeber" name="auftraggeber[]" size=10 multiple>
-						
+						<select id="person2projekt" name="person2projekt[]" size=10 multiple>
+<?php
+	$res = $db->query("SELECT * FROM t_data_person WHERE id IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
+	while ($row = $res->fetchArray()) {
+		print "<option value='{$row['id']}'>{$row['nachname']}</option>\n";
+	}
+?>							
 						</select>
 					</td>
 				</tr>
