@@ -2,6 +2,145 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="ppm.css">
+		
+		<script type="text/javascript">
+			function addToPerson2Projekt(projektID, rolleID) {
+				listPersonenLength = personen.length;
+				
+				// add selected person(s) to person2projekt
+				for (i = 0; i < listPersonenLength; i++) {
+					if (personen.options[i].selected == true) {
+						listPerson2ProjektLength = person2projekt.length;
+						person2projekt.options[listPerson2ProjektLength] = new Option(personen.options[i].text, personen.options[i].value);
+						
+						// push POST
+						var form = document.createElement("form");
+						form.method = "POST";
+						form.action = "updatePerson2Projekt_iframe.html";
+						form.target = "updatePerson2Projekt_iframe";
+						
+						var input_todo = document.createElement("input");
+						input_todo.id = "todo";
+						input_todo.name = "todo";
+						input_todo.type = "hidden";
+						input_todo.value = "insert";
+						form.appendChild(input_todo);
+						
+						var input_person = document.createElement("input");
+						input_person.id = "person";
+						input_person.name = "person";
+						input_person.type = "hidden";
+						input_person.value = personen.options[i].value;
+						form.appendChild(input_person);
+						
+						var input_rolle = document.createElement("input");
+						input_rolle.id = "rolle";
+						input_rolle.name = "rolle";
+						input_rolle.type = "hidden";
+						input_rolle.value = rolleID;
+						form.appendChild(input_rolle);
+						
+						var input_projekt = document.createElement("input");
+						input_projekt.id = "projekt";
+						input_projekt.name = "projekt";
+						input_projekt.type = "hidden";
+						input_projekt.value = projektID;
+						form.appendChild(input_projekt);
+						
+						document.body.appendChild(form);
+						
+						window.open('', 'updatePerson2Projekt_iframe');
+						form.submit();
+					}
+				}
+				
+				// remove selected person(s) from list
+				for (i = (listPersonenLength - 1); i >=0; i--) {
+					if (personen.options[i].selected == true) {
+						personen.options[i] = null;
+					}
+				}
+				
+				// sort list with added element
+				sortOptions(person2projekt);
+			}
+			
+			function removeFromPerson2Projekt(projektID, rolleID) {
+				listPerson2ProjektLength = person2projekt.length;
+				
+				for (i = 0; i < listPerson2ProjektLength; i++) {
+					if (person2projekt.options[i].selected == true) {
+						listPersonenLength = personen.length;
+						personen.options[listPersonenLength] = new Option(person2projekt.options[i].text, person2projekt.options[i].value);
+						
+						// push POST
+						var form = document.createElement("form");
+						form.method = "POST";
+						form.action = "updatePerson2Projekt_iframe.html";
+						form.target = "updatePerson2Projekt_iframe";
+						
+						var input_todo = document.createElement("input");
+						input_todo.id = "todo";
+						input_todo.name = "todo";
+						input_todo.type = "hidden";
+						input_todo.value = "delete";
+						form.appendChild(input_todo);
+						
+						var input_person = document.createElement("input");
+						input_person.id = "person";
+						input_person.name = "person";
+						input_person.type = "hidden";
+						input_person.value = person2projekt.options[i].value;
+						form.appendChild(input_person);
+						
+						var input_rolle = document.createElement("input");
+						input_rolle.id = "rolle";
+						input_rolle.name = "rolle";
+						input_rolle.type = "hidden";
+						input_rolle.value = rolleID;
+						form.appendChild(input_rolle);
+						
+						var input_projekt = document.createElement("input");
+						input_projekt.id = "projekt";
+						input_projekt.name = "projekt";
+						input_projekt.type = "hidden";
+						input_projekt.value = projektID;
+						form.appendChild(input_projekt);
+						
+						document.body.appendChild(form);
+						
+						window.open('', 'updatePerson2Projekt_iframe');
+						form.submit();
+					}
+				}
+				
+				for (i = (listPerson2ProjektLength - 1); i >=0; i--) {
+					if (person2projekt.options[i].selected == true) {
+						person2projekt.options[i] = null;
+					}
+				}
+				
+				sortOptions(personen);
+			}
+			
+			function sortOptions(selElem) {
+				var tmpAry = new Array();
+				for (var i=0;i<selElem.options.length;i++) {
+					tmpAry[i] = new Array();
+					tmpAry[i][0] = selElem.options[i].text;
+					tmpAry[i][1] = selElem.options[i].value;
+				}
+				tmpAry.sort();
+				while (selElem.options.length > 0) {
+					selElem.options[0] = null;
+				}
+				for (var i=0;i<tmpAry.length;i++) {
+					var op = new Option(tmpAry[i][0], tmpAry[i][1]);
+					selElem.options[i] = op;
+				}
+				return;
+			}
+		</script>
 	</head>
 	<body>
 <?php
@@ -10,32 +149,55 @@
 	print "dbFile: {$ini['dbFile']}<br />\n";
 	
 	$projektID = $_POST['projektID'];
-	if (isset($_POST['person2projekt'])) {
-		$person2projekt = $_POST['person2projekt'];
-	} else {
-		$person2projekt = 0;
-	};
-	
-	$rolle = $_POST['rolleID'];
+	$rolleID = $_POST['rolleID'];
 	
 	// DEBUG
 	$postData = file_get_contents("php://input");
 	var_dump($postData);
 	
-	foreach($person2projekt as $item) {
-		// TODO: vor INSERT auf Vorhandensein gleicher Einträge prüfen
-		// TODO: entfernte Assoziationen berücksichtigen
-		
-		//$res = $db->query("SELECT COUNT(*) FROM t_rel_person2projekt WHERE fk_person = {$item} AND fk_projekt = {$projektID} AND fk_rolle = 1");
-		
-		$stmt = $db->prepare('INSERT INTO t_rel_person2projekt (fk_person, fk_projekt, fk_rolle) VALUES (:fk_person, :fk_projekt, :fk_rolle)');
-		$stmt->bindParam(':fk_person', $item);
-		$stmt->bindParam(':fk_projekt', $projektID);
-		$stmt->bindParam(':fk_rolle', $rolle);
-		
-		$stmt->execute();
+	print "projektID: {$projektID}\n";
+	print "rolleID: {$rolleID}\n";
+	
+	$res = $db->query("SELECT name FROM t_list_rolle WHERE id = {$rolleID}");
+	while ($row = $res->fetchArray()) {
+		$rolle = $row['name'];
 	}
-
 ?>
+		<h2>Setze <?php print $rolle; ?> für Projekt ID <?php print $projektID; ?></h2>
+			<table>
+				<tr>
+					<th>Personen</th>
+					<th></th>
+					<th><?php print $rolle; ?></th>
+				</tr>
+				<tr>
+					<td>
+						<select id="personen" name="personen" size=10 style="width: 200px;">
+<?php
+	$res = $db->query("SELECT * FROM t_data_person WHERE id NOT IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
+	while ($row = $res->fetchArray()) {
+		print "<option value='{$row['id']}'>{$row['nachname']}, {$row['vorname']}</option>\n";
+	}
+?>			
+					</select>
+				</td>
+				<td>
+					<input type="button" onClick="addToPerson2Projekt(<?php print $projektID . ", " . $rolleID; ?>)" value=">>" />
+					<br /><br />
+					<input type="button" onClick="removeFromPerson2Projekt(<?php print $projektID . ", " . $rolleID; ?>)" value="<<" />
+				</td>
+				<td>
+					<select id="person2projekt" name="person2projekt[]" size=10 style="width: 200px;">
+<?php
+	$res = $db->query("SELECT * FROM t_data_person WHERE id IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
+	while ($row = $res->fetchArray()) {
+		print "<option value='{$row['id']}'>{$row['nachname']}, {$row['vorname']}</option>\n";
+	}
+?>							
+					</select>
+				</td>
+			</tr>
+		</table>
+		<iframe name="updatePerson2Projekt_iframe" src="updatePerson2Projekt_iframe.html" />
 	</body>
 </html>

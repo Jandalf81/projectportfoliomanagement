@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="ppm.css">
+	</head>
+	<body>
+<?php
+	// DEBUG
+	$postData = file_get_contents("php://input");
+	var_dump($postData);
+	
+	$ini = parse_ini_file('ppm.ini');
+	$db = new SQLite3("{$ini['dbFile']}");
+	print "dbFile: {$ini['dbFile']}<br />\n";
+	
+	
+	if (isset($_POST['todo'])) {
+		$todo = $_POST['todo'];
+	} else {
+		$todo = "nothing";
+	}
+	
+	if (isset($_POST['projekt'])) {
+		$projekt = $_POST['projekt'];
+	} else {
+		$projekt = 0;
+	}
+	
+	if (isset($_POST['person'])) {
+		$person = $_POST['person'];
+	} else {
+		$person = 0;
+	}
+	
+	if (isset($_POST['rolle'])) {
+		$rolle = $_POST['rolle'];
+	} else {
+		$rolle = 0;
+	}
+	
+	try {
+		if ($todo == "nothing") {
+			print "WAITING...<br />\n";
+		} else {
+			if ($todo == "insert") {
+				print "INSERT...<br />\n";
+				$stmt = $db->prepare('INSERT INTO t_rel_person2projekt (fk_person, fk_projekt, fk_rolle) VALUES (:fk_person, :fk_projekt, :fk_rolle)');
+			}
+			
+			if ($todo == "delete") {
+				print "DELETE...<br />\n";
+				$stmt = $db->prepare('DELETE FROM t_rel_person2projekt WHERE fk_person = :fk_person AND fk_projekt = :fk_projekt AND fk_rolle = :fk_rolle');
+			}
+			
+			$stmt->bindParam(':fk_person', $person);
+			$stmt->bindParam(':fk_projekt', $projekt);
+			$stmt->bindParam(':fk_rolle', $rolle);
+			
+			$stmt->execute();
+			
+			print "Success!<br />\n";
+		}
+	}
+	catch(Exception $e) {
+		print "Error!<br />";
+		print $e->getMessage();
+	}
+?>
+	</body>
+</html>
