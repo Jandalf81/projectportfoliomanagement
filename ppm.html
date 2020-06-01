@@ -22,7 +22,7 @@
 				mainData = new google.visualization.DataTable();
 				
 				mainData.addColumn('string', 'id');					// 0
-				mainData.addColumn('string', 'vorgänger');          // 1
+				mainData.addColumn('string', 'nummer');          	// 1
 				mainData.addColumn('string', 'name');               // 2
 				mainData.addColumn('string', 'startdatum');         // 3
 				mainData.addColumn('string', 'enddatum');           // 4
@@ -36,6 +36,7 @@
 				mainData.addColumn('string', 'komplexität');        // 12
 				mainData.addColumn('string', 'status');             // 13
 				mainData.addColumn('number', 'fortschritt');        // 14
+				mainData.addColumn('string', 'vorgänger');			// 15
 				
 				
 				console.log('mainData columns: ' + mainData.getNumberOfColumns());
@@ -46,7 +47,7 @@
 
 	$db = new SQLite3("{$ini['dbFile']}");
 	
-	$res = $db->query('SELECT * FROM v_ppm_php');
+	$res = $db->query('SELECT * FROM v_ppm');
 	
 	while ($row = $res->fetchArray()) {
 		// return DATE if set, else NULL
@@ -62,7 +63,7 @@
 		}
 		
 		// add row to mainData
-		echo "['{$row['id']}', '{$row['vorgänger']}', '{$row['name']}', '{$row['startdatum']}', '{$row['enddatum']}', {$startdate}, {$enddate}, {$row['dauer']}, '{$row['auftraggeber']}', '{$row['projektleiter']}', '{$row['mitglieder']}', '{$row['priorität']}', '{$row['komplexität']}', '{$row['status']}', {$row['fortschritt']}],\n";
+		echo "['{$row['id']}', '{$row['nummer']}', '{$row['name']}', '{$row['startdatum']}', '{$row['enddatum']}', {$startdate}, {$enddate}, {$row['dauer']}, '{$row['auftraggeber']}', '{$row['projektleiter']}', '{$row['mitglieder']}', '{$row['priorität']}', '{$row['komplexität']}', '{$row['status']}', {$row['fortschritt']}, '{$row['vorgänger']}'],\n";
 	}
 ?>
 				]);
@@ -79,7 +80,7 @@
 						
 			function drawTableChart() {
 				var viewTable = new google.visualization.DataView(mainData)
-				viewTable.setColumns([0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+				viewTable.setColumns([0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
 
 
 				table = new google.visualization.Table(document.getElementById('table_chart_div'));
@@ -134,7 +135,7 @@
 					{column: 7, minValue: 1}
 				]));
 				// filter columns from mainData in view
-				viewGantt.setColumns([0, 2, 9, 5, 6, 7, 14, 1]);
+				viewGantt.setColumns([0, 2, 9, 5, 6, 7, 14, 15]);
 				
 				var options = {
 					height: 500,
@@ -180,12 +181,12 @@
 <?php
 	$db = new SQLite3("{$ini['dbFile']}");
 	
-	$res = $db->query("SELECT DISTINCT projektleiter FROM v_ppm_php WHERE status IN ('eingeplant', 'in Arbeit')");
+	$res = $db->query("SELECT DISTINCT projektleiter FROM v_ppm WHERE status IN ('eingeplant', 'in Arbeit')");
 	while ($row = $res->fetchArray()) {
 		echo "['{$row['projektleiter']}', 'Projekte', null],\n";
 	}
 	
-	$res = $db->query("SELECT name, projektleiter, dauer FROM v_ppm_php WHERE status IN ('eingeplant', 'in Arbeit')");
+	$res = $db->query("SELECT name, projektleiter, dauer FROM v_ppm WHERE status IN ('eingeplant', 'in Arbeit')");
 	while ($row = $res->fetchArray()) {
 		echo "['{$row['name']}', '{$row['projektleiter']}', {$row['dauer']}],\n";
 	}
@@ -241,7 +242,7 @@
 	
 	while ($row = $res->fetchArray()) {
 		echo "<tr>";
-		echo "<td>{$row['id']}</td><td>{$row['vorgänger']}</td><td>{$row['name']}</td><td>{$row['startdatum']}</td><td>{$row['enddatum']}</td><td>{$row['auftraggeber']}</td><td>{$row['projektleiter']}</td><td>{$row['mitglieder']}</td><td>{$row['priorität']}</td><td>{$row['komplexität']}</td><td>{$row['status']}</td><td>{$row['fortschritt']}</td>";
+		echo "<td>{$row['id']}</td><td>{$row['nummer']}</td><td>{$row['name']}</td><td>{$row['startdatum']}</td><td>{$row['enddatum']}</td><td>{$row['auftraggeber']}</td><td>{$row['projektleiter']}</td><td>{$row['mitglieder']}</td><td>{$row['priorität']}</td><td>{$row['komplexität']}</td><td>{$row['status']}</td><td>{$row['fortschritt']}</td>";
 		echo "</tr>\n";
 	}
 ?>

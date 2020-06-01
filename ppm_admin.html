@@ -112,7 +112,7 @@
 		
 		print "<td><input type='hidden' name='todo' value='update'><input type='text' name='id' value='{$row['id']}' readonly></td>\n";
 		
-		print "<td><input type='text' name='vorgänger' value='{$row['vorgänger']}'>  <img src='icons/chart_line_edit.png' /></td>\n";
+		print "<td><input type='text' name='nummer' value='{$row['nummer']}'>  <img src='icons/chart_line_edit.png' /></td>\n";
 		print "<td><input type='text' name='name' value='{$row['name']}'></td>\n";
 		print "<td><input type='text' name='auftraggeber' readonly> <img src='icons/user_edit.png' onclick='updatePerson2Projekt({$row['id']}, 1)' /></td>\n";
 		
@@ -156,28 +156,28 @@
 				<div name="Speichern" class="col-1">Speichern</div>
 			</div>
 			<div name='projektzeile1' class='row rowTop rowBottom rowOdd'>
-				<form action='updateProjekt.html' method='POST' target='POPUPW' onsubmit='POPUPW = window.open("about:blank", "POPUPW", "width=600,height=400")'
-				<input type='hidden' name='todo' value='update'>
-				<div name='id' class='col-1'><input type='text' name='id' readonly></div>
-				<div name='Nummer' class='col-1'><input type='text' name='nummer' readonly></div>
-				<div name='Name' class='col-3'><input type='text' name='name' required></div>
-				<div name='Startdatum' class='col-1'><input type='date' name='startdatum'></div>
-				<div name='Enddatum' class='col-1'><input type='date' name='enddatum'></div>
-				<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1' required>
-					<option value="" disabled selected>bitte auswählen</option>
-					<?php $ddPriorität->listOptions(); ?>
-				</select></div>
-				<div name='Komplexität' class='col-1'><select name='fk_komplexität' 'size='1' required>
-					<option value="" disabled selected>bitte auswählen</option>
-					<?php $ddKomplexität->listOptions(); ?>
-				</select></div>
-				<div name='Status' class='col-1'><select name='fk_status' 'size='1' required>
-					<option value="" disabled selected>bitte auswählen</option>
-					<?php $ddStatus->listOptions(); ?>
-				</select></div>
-				<div name='Fortschritt' class='col-1'><input type='number' name='fortschritt' min='0' max='100'></div>
-				<div name='Speichern' class='col-1'><input type='submit' name='update' value='anlegen'></div>
-			</form>
+				<form action='updateProjekt.html' method='POST' target='POPUPW' onsubmit='POPUPW = window.open("about:blank", "POPUPW", "width=600,height=400")'>
+					<input type='hidden' name='todo' value='insert'>
+					<div name='id' class='col-1'><input type='text' name='id' readonly></div>
+					<div name='Nummer' class='col-1'><input type='text' name='nummer'></div>
+					<div name='Name' class='col-3'><input type='text' name='name' required></div>
+					<div name='Startdatum' class='col-1'><input type='date' name='startdatum'></div>
+					<div name='Enddatum' class='col-1'><input type='date' name='enddatum'></div>
+					<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1' required>
+						<option value="" disabled selected>bitte auswählen</option>
+						<?php $ddPriorität->listOptions(); ?>
+					</select></div>
+					<div name='Komplexität' class='col-1'><select name='fk_komplexität' 'size='1' required>
+						<option value="" disabled selected>bitte auswählen</option>
+						<?php $ddKomplexität->listOptions(); ?>
+					</select></div>
+					<div name='Status' class='col-1'><select name='fk_status' 'size='1' required>
+						<option value="" disabled selected>bitte auswählen</option>
+						<?php $ddStatus->listOptions(); ?>
+					</select></div>
+					<div name='Fortschritt' class='col-1'><input type='number' name='fortschritt' min='0' max='100'></div>
+					<div name='Speichern' class='col-1'><input type='submit' name='update' value='anlegen'></div>
+				</form>
 			</div>
 		</details>
 		<br />

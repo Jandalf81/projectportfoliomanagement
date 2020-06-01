@@ -1,28 +1,7 @@
-CREATE VIEW v_ppm AS 
+CREATE VIEW v_ppm AS
 SELECT
 	p.id,
-	p.vorgänger,
-	p.name,
-	p.startdatum,
-	p.enddatum,
-	p.auftraggeber,
-	p.projektleiter,
-	p.mitglieder,
-	pr.name [priorität],
-	k.name [komplexität],
-	s.name [status],
-	p.fortschritt
-FROM
-	t_data_projekt p
-	INNER JOIN t_list_priorität pr ON p.fk_priorität = pr.id
-	INNER JOIN t_list_komplexität k ON p.fk_komplexität = k.id
-	INNER JOIN t_list_status s ON p.fk_status = s.id
-;
-
-CREATE VIEW v_ppm_php AS
-SELECT
-	p.id,
-	p.vorgänger,
+	p.nummer,
 	p.name,
 	p.startdatum,
 	strftime('%Y, ', p.startdatum) || (strftime('%m', p.startdatum)-1) || strftime(', %d', p.startdatum) startdatum_php,
@@ -35,7 +14,8 @@ SELECT
 	pr.name [priorität],
 	k.name [komplexität],
 	s.name [status],
-	p.fortschritt
+	p.fortschritt,
+	(SELECT parent FROM v_projekt2projekt p2p WHERE fk_sub = p.id) [vorgänger]
 FROM
 	t_data_projekt p
 	INNER JOIN t_list_priorität pr ON p.fk_priorität = pr.id
@@ -43,7 +23,7 @@ FROM
 	INNER JOIN t_list_status s ON p.fk_status = s.id
 GROUP BY
 	p.id,
-	p.vorgänger,
+	p.nummer,
 	p.name,
 	p.startdatum,
 	strftime('%Y, ', p.startdatum) || (strftime('%m', p.startdatum)-1) || strftime(', %d', p.startdatum),
@@ -77,4 +57,15 @@ FROM (
 GROUP BY
 	fk_projekt,
 	fk_rolle
+;
+
+CREATE VIEW v_projekt2projekt AS
+SELECT
+	fk_sub,
+	GROUP_CONCAT(fk_parent) [parent]
+FROM 
+	t_rel_projekt2projekt p2p
+	INNER JOIN t_data_projekt p ON p2p.fk_sub = p.id
+GROUP BY
+	fk_sub
 ;

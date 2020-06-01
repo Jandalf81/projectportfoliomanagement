@@ -18,6 +18,7 @@
 	} else {
 		$id = 0;
 	};
+	$nummer = $_POST['nummer'];
 	$name = $_POST['name'];
 	$startdatum = $_POST['startdatum'];
 	$enddatum = $_POST['enddatum'];
@@ -26,6 +27,7 @@
 	$fk_status = $_POST['fk_status'];
 	$fortschritt = $_POST['fortschritt'];
 
+	$user = $_SERVER['AUTH_USER'];
 	
 
 	$db =  new SQLite3("{$ini['dbFile']}");
@@ -34,8 +36,9 @@
 		if ($todo == 'insert') {
 			print "INSERT";
 			
-			$stmt = $db->prepare('INSERT INTO t_data_projekt (name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt) VALUES ' .
-				'(:name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt)');
+			$stmt = $db->prepare('INSERT INTO t_data_projekt (nummer, name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt, createdBy, lastUpdatedBy) VALUES ' .
+				'(:nummer, :name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt, :createdBy, :lastUpdatedBy)');
+			$stmt->bindParam(':nummer', $nummer);
 			$stmt->bindParam(':name', $name);
 			$stmt->bindParam(':startdatum', $startdatum);
 			$stmt->bindParam(':enddatum', $enddatum);
@@ -43,6 +46,8 @@
 			$stmt->bindParam(':fk_komplexität', $fk_komplexität);
 			$stmt->bindParam(':fk_status', $fk_status);
 			$stmt->bindParam(':fortschritt', $fortschritt);
+			$stmt->bindParam(':createdBy', $user);
+			$stmt->bindParam(':lastUpdatedBy', $user);
 		}
 		
 		if ($todo == 'update') {
