@@ -29,9 +29,9 @@ SELECT
 	p.enddatum,
 	strftime('%Y, ', p.enddatum) || (strftime('%m', p.enddatum)-1) || strftime(', %d', p.enddatum) enddatum_php,
     COALESCE(julianday(enddatum) - julianday(startdatum), 0) dauer,
-	GROUP_CONCAT(ag.nachname, ',<br />') [auftraggeber],
-	p.projektleiter,
-	p.mitglieder,
+	(SELECT liste FROM v_personen2projekt p2p WHERE fk_projekt = p.id AND fk_rolle = 1) [auftraggeber],
+	(SELECT liste FROM v_personen2projekt p2p WHERE fk_projekt = p.id AND fk_rolle = 2) [projektleiter],
+	(SELECT liste FROM v_personen2projekt p2p WHERE fk_projekt = p.id AND fk_rolle = 3) [mitglieder],
 	pr.name [priorität],
 	k.name [komplexität],
 	s.name [status],
@@ -41,8 +41,6 @@ FROM
 	INNER JOIN t_list_priorität pr ON p.fk_priorität = pr.id
 	INNER JOIN t_list_komplexität k ON p.fk_komplexität = k.id
 	INNER JOIN t_list_status s ON p.fk_status = s.id
-	LEFT OUTER JOIN t_rel_person2projekt per2pro1 ON p.id = per2pro1.fk_projekt AND per2pro1.fk_rolle = 1
-	LEFT OUTER JOIN t_data_person ag ON per2pro1.fk_person = ag.id
 GROUP BY
 	p.id,
 	p.vorgänger,
@@ -52,10 +50,31 @@ GROUP BY
 	p.enddatum,
 	strftime('%Y, ', p.enddatum) || (strftime('%m', p.enddatum)-1) || strftime(', %d', p.enddatum),
     COALESCE(julianday(enddatum) - julianday(startdatum), 0),
-	p.projektleiter,
-	p.mitglieder,
 	pr.name,
 	k.name,
 	s.name,
 	p.fortschritt
+;
+
+CREATE VIEW v_personen2projekt AS
+SELECT 
+	fk_projekt,
+	fk_rolle,
+	GROUP_CONCAT(nachname || ', ' || vorname, ',<br />') [liste]
+FROM (
+	SELECT
+		p2p.fk_projekt,
+		p2p.fk_rolle,
+		p.nachname,
+		p.vorname
+	FROM 
+		t_rel_person2projekt p2p
+		INNER JOIN t_data_person p ON p2p.fk_person = p.id
+	ORDER BY
+		p.nachname,
+		p.vorname
+)
+GROUP BY
+	fk_projekt,
+	fk_rolle
 ;

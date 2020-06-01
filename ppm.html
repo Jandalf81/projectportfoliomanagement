@@ -180,7 +180,7 @@
 <?php
 	$db = new SQLite3("{$ini['dbFile']}");
 	
-	$res = $db->query("SELECT DISTINCT projektleiter FROM v_ppm WHERE status IN ('eingeplant', 'in Arbeit')");
+	$res = $db->query("SELECT DISTINCT projektleiter FROM v_ppm_php WHERE status IN ('eingeplant', 'in Arbeit')");
 	while ($row = $res->fetchArray()) {
 		echo "['{$row['projektleiter']}', 'Projekte', null],\n";
 	}

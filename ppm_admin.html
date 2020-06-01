@@ -82,8 +82,7 @@
 					</form>
 				</tr>
 			</table>
-		</details>
-		
+		</details>		
 		
 		<h2>Bestehende Projekte aktualisieren</h2>
 		<table>
@@ -139,5 +138,118 @@
 	}
 ?>
 		</table>
+		
+		<h2>Darstellung in DIVs</h2>
+		
+		<details>
+			<summary><img src="./icons/add.png" /> Neues Projekt anlegen</summary>
+			<div name="kopfzeile1" class="row tableHeader rowTopHeader">
+				<div name="id" class="col-1">ID</div>
+				<div name="Nummer" class="col-1">Nummer</div>
+				<div name="Name" class="col-3">Name</div>
+				<div name="Startdatum" class="col-1">Startdatum</div>
+				<div name="Enddatum" class="col-1">Enddatum</div>
+				<div name="priorität" class="col-1">Priorität</div>
+				<div name="Komplexität" class="col-1">Komplexität</div>
+				<div name="Status" class="col-1">Status</div>
+				<div name="Fortschritt" class="col-1">Fortschritt</div>
+				<div name="Speichern" class="col-1">Speichern</div>
+			</div>
+			<div name='projektzeile1' class='row rowTop rowBottom rowOdd'>
+				<form action='updateProjekt.html' method='POST' target='POPUPW' onsubmit='POPUPW = window.open("about:blank", "POPUPW", "width=600,height=400")'
+				<input type='hidden' name='todo' value='update'>
+				<div name='id' class='col-1'><input type='text' name='id' readonly></div>
+				<div name='Nummer' class='col-1'><input type='text' name='nummer' readonly></div>
+				<div name='Name' class='col-3'><input type='text' name='name' required></div>
+				<div name='Startdatum' class='col-1'><input type='date' name='startdatum'></div>
+				<div name='Enddatum' class='col-1'><input type='date' name='enddatum'></div>
+				<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1' required>
+					<option value="" disabled selected>bitte auswählen</option>
+					<?php $ddPriorität->listOptions(); ?>
+				</select></div>
+				<div name='Komplexität' class='col-1'><select name='fk_komplexität' 'size='1' required>
+					<option value="" disabled selected>bitte auswählen</option>
+					<?php $ddKomplexität->listOptions(); ?>
+				</select></div>
+				<div name='Status' class='col-1'><select name='fk_status' 'size='1' required>
+					<option value="" disabled selected>bitte auswählen</option>
+					<?php $ddStatus->listOptions(); ?>
+				</select></div>
+				<div name='Fortschritt' class='col-1'><input type='number' name='fortschritt' min='0' max='100'></div>
+				<div name='Speichern' class='col-1'><input type='submit' name='update' value='anlegen'></div>
+			</form>
+			</div>
+		</details>
+		<br />
+
+		<div name="kopfzeile1" class="row tableHeader rowTopHeader">
+			<div name="id" class="col-1">ID</div>
+			<div name="Nummer" class="col-1">Nummer</div>
+			<div name="Name" class="col-3">Name</div>
+			<div name="Startdatum" class="col-1">Startdatum</div>
+			<div name="Enddatum" class="col-1">Enddatum</div>
+			<div name="priorität" class="col-1">Priorität</div>
+			<div name="Komplexität" class="col-1">Komplexität</div>
+			<div name="Status" class="col-1">Status</div>
+			<div name="Fortschritt" class="col-1">Fortschritt</div>
+			<div name="Speichern" class="col-1">Speichern</div>
+		</div>
+		<div name="kopfzeile2" class="row tableHeader rowBottom">
+			<div name="Vorgänger" class="col-3">Vorgänger</div>
+			<div name="Auftraggeber" class="col-3">Auftraggeber</div>
+			<div name="Projektleiter" class="col-3">Projektleiter</div>
+			<div name="Team" class="col-3">Team</div>
+		</div>
+<?php
+	$res = $db->query('SELECT * FROM t_data_projekt ORDER BY id');
+	$i = 0;
+	
+	while ($row = $res->fetchArray()) {
+		$i++;
+		if ($i % 2 == 0) {
+			$rowType = "rowEven";
+		} else {
+			$rowType = "rowOdd";
+		}
+		
+		print "<div name='projektzeile1' class='row rowTop {$rowType}'>\n";
+		print "<form action='updateProjekt.html' method='POST' target='POPUPW' onsubmit='POPUPW = window.open(\"about:blank\", \"POPUPW\", \"width=600,height=400\");'>\n";
+			print "<input type='hidden' name='todo' value='update'>\n";
+			print "<div name='id' class='col-1'><input type='text' name='id' value='{$row['id']}' readonly></div>\n";
+			print "<div name='Nummer' class='col-1'><input type='text' name='nummer' value='Nummer' readonly></div>\n";
+			print "<div name='Name' class='col-3'><input type='text' name='name' value='{$row['name']}'></div>\n";
+			print "<div name='Startdatum' class='col-1'><input type='date' name='startdatum' value={$row['startdatum']}></div>\n";
+			print "<div name='Enddatum' class='col-1'><input type='date' name='enddatum' value={$row['enddatum']}></div>\n";
+			print "<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1'>";
+				$ddPriorität->listOptionsWithSelected($row['fk_priorität']);
+			print "</select></div>\n";
+			print "<div name='Komplexität' class='col-1'><select name='fk_komplexität' 'size='1'>";
+				$ddKomplexität->listOptionsWithSelected($row['fk_komplexität']);
+			print "</select></div>\n";
+			print "<div name='Status' class='col-1'><select name='fk_status' 'size='1'>";
+				$ddStatus->listOptionsWithSelected($row['fk_status']);
+			print "</select></div>\n";
+			print "<div name='Fortschritt' class='col-1'><input type='number' name='fortschritt' min='0' max='100' value={$row['fortschritt']}></div>\n";
+			print "<div name='Speichern' class='col-1'><input type='submit' name='update' value='update'></div>\n";
+		print "</form>\n";
+		print "</div>\n";
+		
+		print "<div name='projektzeile2' class='row rowBottom {$rowType}'>\n";
+		print "<div name='Vorgänger' class='col-3'><button onclick='updateProjekt2Projekt({$row['id']})'><img src='icons/chart_line.png'> Vorgänger:</button></div>\n";
+		print "<div name='Auftraggeber' class='col-3'><button onclick='updatePerson2Projekt({$row['id']}, 1)'><img src='icons/money_dollar.png' /> Auftraggeber:</button><br />\n";
+			$ag = $db->querySingle("SELECT liste FROM v_personen2projekt WHERE fk_projekt = {$row['id']} AND fk_rolle = 1");
+			print "{$ag}";
+		print "</div>\n";
+		print "<div name='Projektleiter' class='col-3'><button onclick='updatePerson2Projekt({$row['id']}, 2)'><img src='icons/user.png' /> Projektleiter:</button><br />\n";
+			$pl = $db->querySingle("SELECT liste FROM v_personen2projekt WHERE fk_projekt = {$row['id']} AND fk_rolle = 2");
+			print "{$pl}";
+		print "</div>\n";
+		print "<div name='Team' class='col-3'><button onclick='updatePerson2Projekt({$row['id']}, 3)'><img src='icons/group.png' /> Team:</button><br />\n";
+			$team = $db->querySingle("SELECT liste FROM v_personen2projekt WHERE fk_projekt = {$row['id']} AND fk_rolle = 3");
+			print "{$team}";
+		print "</div>\n";
+		print "</div>\n";
+	}
+?>
 	</body>
 </html>

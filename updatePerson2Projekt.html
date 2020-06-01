@@ -172,7 +172,7 @@
 				</tr>
 				<tr>
 					<td>
-						<select id="personen" name="personen" size=10 style="width: 200px;">
+						<select id="personen" name="personen" size=10 style="width: 200px;" class="fullHeight">
 <?php
 	$res = $db->query("SELECT * FROM t_data_person WHERE id NOT IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
 	while ($row = $res->fetchArray()) {
@@ -187,7 +187,7 @@
 					<input type="button" onClick="removeFromPerson2Projekt(<?php print $projektID . ", " . $rolleID; ?>)" value="<<" />
 				</td>
 				<td>
-					<select id="person2projekt" name="person2projekt[]" size=10 style="width: 200px;">
+					<select id="person2projekt" name="person2projekt[]" size=10 style="width: 200px;" class="fullHeight">
 <?php
 	$res = $db->query("SELECT * FROM t_data_person WHERE id IN (SELECT fk_person FROM t_rel_person2projekt WHERE fk_projekt = {$projektID} AND fk_rolle = {$rolleID})");
 	while ($row = $res->fetchArray()) {

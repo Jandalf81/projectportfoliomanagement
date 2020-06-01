@@ -1,6 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
 table, th, td {
 	border-collapse: collapse; 
-	border:1px solid black; 
+	border: 1px solid black; 
 	padding: 10px
 }
 .tableHeader, th {
@@ -22,3 +26,82 @@ tr:hover {
 .selectedRow {
 	background-color: #f00 !important
 }
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 5px;
+  border: 1px solid lightgrey;
+}
+
+.rowTopHeader {
+	border-top: 2px solid black;
+	border-left: 2px solid black;
+	border-right: 2px solid black;
+}
+
+.rowTop {
+	border-left: 2px solid black;
+	border-right: 2px solid black;
+}
+
+.rowBottom {
+	border-bottom: 2px solid black;
+	border-left: 2px solid black;
+	border-right: 2px solid black;
+}
+
+.rowEven {
+	background-color: #b2e0f2;
+}
+
+input[type="text" i] {
+	width: 100%;
+}
+
+input[type="date" i] {
+	height: 21px;
+	width: 100%;
+}
+
+input[type="number" i] {
+	height: 21px;
+	width: 100%;
+}
+
+input[type="submit" i] {
+	height: 21px;
+	width: 100%;
+}
+
+select {
+	height: 21px;
+	width: 100%;
+}
+
+button {
+	height: 24px;
+	width: 50%;
+}
+
+.fullHeight {
+	height: 100%;
+}
+
+.col-1 {width: 8.3333%;}
+.col-2 {width: 16.6666%;}
+.col-3 {width: 25%;}
+.col-4 {width: 33.3333%;}
+.col-5 {width: 41.6666%;}
+.col-6 {width: 50%;}
+.col-7 {width: 58.3333%;}
+.col-8 {width: 66.6666%;}
+.col-9 {width: 75%;}
+.col-10 {width: 83.3333%;}
+.col-11 {width: 91.6666%;}
+.col-12 {width: 100%;}
