@@ -216,7 +216,7 @@
 		print "<form action='updateProjekt.html' method='POST' target='POPUPW' onsubmit='POPUPW = window.open(\"about:blank\", \"POPUPW\", \"width=600,height=400\");'>\n";
 			print "<input type='hidden' name='todo' value='update'>\n";
 			print "<div name='id' class='col-1'><input type='text' name='id' value='{$row['id']}' readonly></div>\n";
-			print "<div name='Nummer' class='col-1'><input type='text' name='nummer' value='Nummer' readonly></div>\n";
+			print "<div name='Nummer' class='col-1'><input type='text' name='nummer' value='{$row['nummer']}' readonly></div>\n";
 			print "<div name='Name' class='col-3'><input type='text' name='name' value='{$row['name']}'></div>\n";
 			print "<div name='Startdatum' class='col-1'><input type='date' name='startdatum' value={$row['startdatum']}></div>\n";
 			print "<div name='Enddatum' class='col-1'><input type='date' name='enddatum' value={$row['enddatum']}></div>\n";

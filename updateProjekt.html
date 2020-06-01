@@ -36,8 +36,11 @@
 		if ($todo == 'insert') {
 			print "INSERT";
 			
-			$stmt = $db->prepare('INSERT INTO t_data_projekt (nummer, name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt, createdBy, lastUpdatedBy) VALUES ' .
-				'(:nummer, :name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt, :createdBy, :lastUpdatedBy)');
+			$date = new DateTime();
+			$now = date_format($date, 'Y-m-d H:i:s');
+			
+			$stmt = $db->prepare('INSERT INTO t_data_projekt (nummer, name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt, createdAt, createdBy, lastUpdatedAt, lastUpdatedBy) VALUES ' .
+				'(:nummer, :name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt, :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy)');
 			$stmt->bindParam(':nummer', $nummer);
 			$stmt->bindParam(':name', $name);
 			$stmt->bindParam(':startdatum', $startdatum);
@@ -48,6 +51,8 @@
 			$stmt->bindParam(':fortschritt', $fortschritt);
 			$stmt->bindParam(':createdBy', $user);
 			$stmt->bindParam(':lastUpdatedBy', $user);
+			$stmt->bindParam(':createdAt', $now);
+			$stmt->bindParam(':lastUpdatedAt', $now);
 		}
 		
 		if ($todo == 'update') {
@@ -62,16 +67,23 @@
 			print "<tr><td>Fortschritt</td><td>{$fortschritt}</td></tr>\n";
 			print "</table>";
 		
+			$date = new DateTime();
+			$now = date_format($date, 'Y-m-d H:i:s');
+			
 			$stmt = $db->prepare('UPDATE t_data_projekt SET ' .
+				'nummer = :nummer, ' .
 				'name = :name, ' .
 				'startdatum = :startdatum, ' .
 				'enddatum = :enddatum, ' .
 				'fk_priorität = :fk_priorität, ' .
 				'fk_komplexität = :fk_komplexität, ' .
 				'fk_status = :fk_status, ' .
-				'fortschritt = :fortschritt ' .
+				'fortschritt = :fortschritt, ' .
+				'lastUpdatedAt = :lastUpdatedAt, ' .
+				'lastUpdatedBy = :lastUpdatedBy ' .
 				'WHERE id = :id');
 			$stmt->bindParam(':id', $id);
+			$stmt->bindParam(':nummer', $nummer);
 			$stmt->bindParam(':name', $name);
 			$stmt->bindParam(':startdatum', $startdatum);
 			$stmt->bindParam(':enddatum', $enddatum);
@@ -79,6 +91,8 @@
 			$stmt->bindParam(':fk_komplexität', $fk_komplexität);
 			$stmt->bindParam(':fk_status', $fk_status);
 			$stmt->bindParam(':fortschritt', $fortschritt);
+			$stmt->bindParam(':lastUpdatedAt', $now);
+			$stmt->bindParam(':lastUpdatedBy', $user);
 		}
 		
 		$stmt->execute();
