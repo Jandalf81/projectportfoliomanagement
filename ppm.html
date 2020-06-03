@@ -4,14 +4,14 @@
 		<link rel="stylesheet" href="ppm.css">
 
 		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+		<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
 		<script type="text/javascript">
 			var mainData;
 			
 			var table;
-			var gantt_chart;
 			
-			google.charts.load('current', {'packages':['table', 'gantt', 'treemap'], 'language': 'de'});
-	
+			google.charts.load('current', {'packages':['table', 'treemap', 'gantt'], 'language': 'de'});
+			
 			google.charts.setOnLoadCallback(loadMainData);
 			
 			google.charts.setOnLoadCallback(drawTableChart);
@@ -44,11 +44,9 @@
 				mainData.addRows([
 <?php
 	$ini = parse_ini_file('ppm.ini');
-
 	$db = new SQLite3("{$ini['dbFile']}");
 	
 	$res = $db->query('SELECT * FROM v_ppm');
-	
 	while ($row = $res->fetchArray()) {
 		// return DATE if set, else NULL
 		if ($row['startdatum_php'] != '') {
@@ -117,8 +115,10 @@
 				return days * 24 * 60 * 60 * 1000;
 			}
 
-
-			function drawGanttChart() {	
+			function drawGanttChart() {
+				var container = document.getElementById('gantt_chart_div');
+				var chart = new google.visualization.Gantt(container);
+			
 				// 0: 	string	 	Task ID
 				// 1: 	string	 	Task Name
 				// 2: 	string	 	Resource
@@ -137,39 +137,111 @@
 				// filter columns from mainData in view
 				viewGantt.setColumns([0, 2, 9, 5, 6, 7, 14, 15]);
 				
+				var dataTableGroup = google.visualization.data.group(viewGantt, [0]);
+				var dateRangeStart = viewGantt.getColumnRange(3);
+				var dateRangeEnd = viewGantt.getColumnRange(4);
+				var formatDate = new google.visualization.DateFormat({pattern: 'dd.MM.yyyy'});
+				var rowHeight = 44;
+
 				var options = {
-					height: 500,
-					// width: 1900,
+					height: (dataTableGroup.getNumberOfRows() * rowHeight) + rowHeight,
 					gantt: {
 						defaultStartDate: new Date(),
 						criticalPathEnabled: false,
 						shadowEnabled: true,
 						shadowOffset: 5,
-						shadowColor: 'pink',
+						shadowColor: 'black',
+						percentEnabled: true,
 						arrow: {
 							width: 4,
 							lenght: 12
 						}
 					}
 				};
-
-				gantt_chart = new google.visualization.Gantt(document.getElementById('gantt_chart_div'));
-
-//				google.visualization.events.addListener(gantt_chart, 'select', function() 
-//				{
-//					var selection = gantt_chart.getSelection();
-//					if (selection.length > 0) {
-//						console.log('Chart Entry selected: ' + mainData.getValue(selection[0].row, 0));
-//						table.setSelection(null);
-//						table.setSelection(selection);
-//					} else {
-//						table.setSelection(null);
-//					}
-//				});
 				
-				gantt_chart.draw(viewGantt, options);
+				function drawChart() {
+					chart.draw(viewGantt, options);
+				}
+				
+				// https://stackoverflow.com/a/48509661
+				function addMarker(markerDate) {
+					var baseline;
+					var baselineBounds;
+					var chartElements;
+					var markerLabel;
+					var markerLine;
+					var markerSpan;
+					var svg;
+					var timeline;
+					var timelineUnit;
+					var timelineWidth;
+					var timespan;
+
+					baseline = 0.0;
+					timeline = null;
+					svg = null;
+					markerLabel = null;
+					chartElements = container.getElementsByTagName('svg');
+					if (chartElements.length > 0) {
+						svg = chartElements[0];
+					}
+					chartElements = container.getElementsByTagName('rect');
+					if (chartElements.length > 0) {
+						timeline = chartElements[0];
+					}
+					
+					// get leftmost RECT not at x=0
+					chartElements = container.getElementsByTagName('rect');
+					if (chartElements.length > 0) {
+						for (let i = 0; i < chartElements.length; i++) {
+							if (chartElements[i].getAttribute('x') > 0 && chartElements[i].getAttribute('x') > baseline) {
+								baseline = chartElements[i].getAttribute('x');
+							}
+						};
+					}
+					
+					chartElements = container.getElementsByTagName('text');
+					if (chartElements.length > 0) {
+						markerLabel = chartElements[0].cloneNode(true);
+					}
+					if ((svg === null) || (timeline === null) || (baseline === null) || (markerLabel === null) || (markerDate.getTime() < dateRangeStart.min.getTime()) || (markerDate.getTime() > dateRangeEnd.max.getTime())) {
+						return;
+					}
+
+					// calculate placement
+					timelineWidth = parseFloat(timeline.getAttribute('width'));
+					//baselineBounds = baseline.getBBox();
+					timespan = dateRangeEnd.max.getTime() - dateRangeStart.min.getTime();
+					timelineUnit = (timelineWidth - baseline) / timespan;
+					markerSpan = markerDate.getTime() - dateRangeStart.min.getTime();
+
+					// add label
+					markerLabel.setAttribute('fill', '#e91e63');
+					markerLabel.setAttribute('y', options.height);
+					markerLabel.setAttribute('x', ((parseFloat(baseline) + (parseFloat(timelineUnit) * parseFloat(markerSpan))) - 4));
+					markerLabel.textContent = formatDate.formatValue(markerDate);
+					svg.appendChild(markerLabel);
+
+					// add line
+					markerLine = timeline.cloneNode(true);
+					markerLine.setAttribute('y', 0);
+					markerLine.setAttribute('x', (parseFloat(baseline) + (parseFloat(timelineUnit) * parseFloat(markerSpan))));
+					markerLine.setAttribute('height', options.height - 16);
+					markerLine.setAttribute('width', 1);
+					markerLine.setAttribute('stroke', 'none');
+					markerLine.setAttribute('stroke-width', '0');
+					markerLine.setAttribute('fill', '#e91e63');
+					svg.appendChild(markerLine);
+				}
+						
+				google.visualization.events.addListener(chart, 'ready', function () {
+					// add marker for current date
+					addMarker(new Date());
+				});
+
+				window.addEventListener('resize', drawChart, false);
+				drawChart();
 			}
-		
 
 			function drawTreeChart() {
 				var data = new google.visualization.DataTable();
@@ -198,9 +270,9 @@
 				var options = {
 					height: 500,
 					highlightOnMouseOver: true,
-					minColor: '#f00',
-					midColor: '#ddd',
-					maxColor: '#0d0',
+					minColor: '#0000aa',
+					midColor: '#0000cc',
+					maxColor: '#0000ff',
 					headerHeight: 15,
 					fontColor: 'black',
 					showScale: true,
