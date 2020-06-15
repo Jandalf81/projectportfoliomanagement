@@ -1,6 +1,7 @@
 CREATE TABLE t_data_projekt (
 	id INTEGER PRIMARY KEY,
 	nummer TEXT,
+	kontext TEXT,
 	name TEXT,
 	startdatum DATE,
 	enddatum DATE,
@@ -25,6 +26,7 @@ CREATE TABLE t_hist_projekt (
 	user TEXT,
 	projektID INTEGER,
 	nummer TEXT,
+	kontext TEXT,
 	name TEXT,
 	startdatum DATE,
 	enddatum DATE,

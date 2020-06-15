@@ -45,6 +45,7 @@
 		</script>
 	</head>
 	<body>
+<!--
 		<details>
 			<summary><img src="./icons/add.png" /> Neues Projekt anlegen</summary>
 			<table>
@@ -93,8 +94,8 @@
 				<th>Auftraggeber</th>
 				<th>Startdatum</th>
 				<th>Enddatum</th>
-<!--				<th>Projektleiter</th>       -->
-<!--				<th>Mitglieder</th>          -->
+				<th>Projektleiter</th> 
+				<th>Mitglieder</th>    
 				<th>Priorität</th>
 				<th>Komplexität</th>
 				<th>Status</th>
@@ -140,13 +141,14 @@
 		</table>
 		
 		<h2>Darstellung in DIVs</h2>
-		
+-->
 		<details>
 			<summary><img src="./icons/add.png" /> Neues Projekt anlegen</summary>
 			<div name="kopfzeile1" class="row tableHeader rowTopHeader">
 				<div name="id" class="col-1">ID</div>
 				<div name="Nummer" class="col-1">Nummer</div>
-				<div name="Name" class="col-3">Name</div>
+				<div name="Kontext" class="col-1">Kontext</div>
+				<div name="Name" class="col-2">Name</div>
 				<div name="Startdatum" class="col-1">Startdatum</div>
 				<div name="Enddatum" class="col-1">Enddatum</div>
 				<div name="priorität" class="col-1">Priorität</div>
@@ -160,7 +162,8 @@
 					<input type='hidden' name='todo' value='insert'>
 					<div name='id' class='col-1'><input type='text' name='id' readonly></div>
 					<div name='Nummer' class='col-1'><input type='text' name='nummer'></div>
-					<div name='Name' class='col-3'><input type='text' name='name' required></div>
+					<div name='Kontext' class='col-1'><input type='text' name='kontext' required></div>
+					<div name='Name' class='col-2'><input type='text' name='name' required></div>
 					<div name='Startdatum' class='col-1'><input type='date' name='startdatum'></div>
 					<div name='Enddatum' class='col-1'><input type='date' name='enddatum'></div>
 					<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1' required>
@@ -185,7 +188,8 @@
 		<div name="kopfzeile1" class="row tableHeader rowTopHeader">
 			<div name="id" class="col-1">ID</div>
 			<div name="Nummer" class="col-1">Nummer</div>
-			<div name="Name" class="col-3">Name</div>
+			<div name="Kontext" class="col-1">Kontext</div>
+			<div name="Name" class="col-2">Name</div>
 			<div name="Startdatum" class="col-1">Startdatum</div>
 			<div name="Enddatum" class="col-1">Enddatum</div>
 			<div name="priorität" class="col-1">Priorität</div>
@@ -217,7 +221,8 @@
 			print "<input type='hidden' name='todo' value='update'>\n";
 			print "<div name='id' class='col-1'><input type='text' name='id' value='{$row['id']}' readonly></div>\n";
 			print "<div name='Nummer' class='col-1'><input type='text' name='nummer' value='{$row['nummer']}' readonly></div>\n";
-			print "<div name='Name' class='col-3'><input type='text' name='name' value='{$row['name']}'></div>\n";
+			print "<div name='Kontext' class='col-1'><input type='text' name='kontext' value='{$row['kontext']}'></div>\n";
+			print "<div name='Name' class='col-2'><input type='text' name='name' value='{$row['name']}'></div>\n";
 			print "<div name='Startdatum' class='col-1'><input type='date' name='startdatum' value={$row['startdatum']}></div>\n";
 			print "<div name='Enddatum' class='col-1'><input type='date' name='enddatum' value={$row['enddatum']}></div>\n";
 			print "<div name='Priorität' class='col-1'><select name='fk_priorität' 'size='1'>";

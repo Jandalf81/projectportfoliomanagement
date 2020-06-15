@@ -19,6 +19,7 @@
 		$id = 0;
 	};
 	$nummer = $_POST['nummer'];
+	$kontext = $_POST['kontext'];
 	$name = $_POST['name'];
 	$startdatum = $_POST['startdatum'];
 	$enddatum = $_POST['enddatum'];
@@ -39,9 +40,10 @@
 			$date = new DateTime();
 			$now = date_format($date, 'Y-m-d H:i:s');
 			
-			$stmt = $db->prepare('INSERT INTO t_data_projekt (nummer, name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt, createdAt, createdBy, lastUpdatedAt, lastUpdatedBy) VALUES ' .
-				'(:nummer, :name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt, :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy)');
+			$stmt = $db->prepare('INSERT INTO t_data_projekt (nummer, kontext, name, startdatum, enddatum, fk_priorität, fk_komplexität, fk_status, fortschritt, createdAt, createdBy, lastUpdatedAt, lastUpdatedBy) VALUES ' .
+				'(:nummer, :kontext, :name, :startdatum, :enddatum, :fk_priorität, :fk_komplexität, :fk_status, :fortschritt, :createdAt, :createdBy, :lastUpdatedAt, :lastUpdatedBy)');
 			$stmt->bindParam(':nummer', $nummer);
+			$stmt->bindParam(':kontext', $kontext);
 			$stmt->bindParam(':name', $name);
 			$stmt->bindParam(':startdatum', $startdatum);
 			$stmt->bindParam(':enddatum', $enddatum);
@@ -72,6 +74,7 @@
 			
 			$stmt = $db->prepare('UPDATE t_data_projekt SET ' .
 				'nummer = :nummer, ' .
+				'kontext = :kontext, ' .
 				'name = :name, ' .
 				'startdatum = :startdatum, ' .
 				'enddatum = :enddatum, ' .
@@ -84,6 +87,7 @@
 				'WHERE id = :id');
 			$stmt->bindParam(':id', $id);
 			$stmt->bindParam(':nummer', $nummer);
+			$stmt->bindParam(':kontext', $kontext);
 			$stmt->bindParam(':name', $name);
 			$stmt->bindParam(':startdatum', $startdatum);
 			$stmt->bindParam(':enddatum', $enddatum);

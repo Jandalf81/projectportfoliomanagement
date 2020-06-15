@@ -37,6 +37,7 @@
 				mainData.addColumn('string', 'status');             // 13
 				mainData.addColumn('number', 'fortschritt');        // 14
 				mainData.addColumn('string', 'vorgänger');			// 15
+				mainData.addColumn('string', 'kontext');			// 16
 				
 				
 				console.log('mainData columns: ' + mainData.getNumberOfColumns());
@@ -61,7 +62,7 @@
 		}
 		
 		// add row to mainData
-		echo "['{$row['id']}', '{$row['nummer']}', '{$row['name']}', '{$row['startdatum']}', '{$row['enddatum']}', {$startdate}, {$enddate}, {$row['dauer']}, '{$row['auftraggeber']}', '{$row['projektleiter']}', '{$row['mitglieder']}', '{$row['priorität']}', '{$row['komplexität']}', '{$row['status']}', {$row['fortschritt']}, '{$row['vorgänger']}'],\n";
+		echo "['{$row['id']}', '{$row['nummer']}', '{$row['name']}', '{$row['startdatum']}', '{$row['enddatum']}', {$startdate}, {$enddate}, {$row['dauer']}, '{$row['auftraggeber']}', '{$row['projektleiter']}', '{$row['mitglieder']}', '{$row['priorität']}', '{$row['komplexität']}', '{$row['status']}', {$row['fortschritt']}, '{$row['vorgänger']}', '{$row['kontext']}'],\n";
 	}
 ?>
 				]);
@@ -78,7 +79,7 @@
 						
 			function drawTableChart() {
 				var viewTable = new google.visualization.DataView(mainData)
-				viewTable.setColumns([0, 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+				viewTable.setColumns([0, 15, 1, 16, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 
 
 				table = new google.visualization.Table(document.getElementById('table_chart_div'));
@@ -135,7 +136,7 @@
 					{column: 7, minValue: 1}
 				]));
 				// filter columns from mainData in view
-				viewGantt.setColumns([0, 2, 9, 5, 6, 7, 14, 15]);
+				viewGantt.setColumns([0, 2, 16, 5, 6, 7, 14, 15]);
 				
 				var dataTableGroup = google.visualization.data.group(viewGantt, [0]);
 				var dateRangeStart = viewGantt.getColumnRange(3);
@@ -181,23 +182,33 @@
 					timeline = null;
 					svg = null;
 					markerLabel = null;
+					
 					chartElements = container.getElementsByTagName('svg');
+					
 					if (chartElements.length > 0) {
 						svg = chartElements[0];
 					}
+					
 					chartElements = container.getElementsByTagName('rect');
 					if (chartElements.length > 0) {
 						timeline = chartElements[0];
 					}
 					
 					// get leftmost RECT not at x=0
+					// start at rightmost coordinate
+					baseline = parseFloat(timeline.getAttribute('width'));
+					
 					chartElements = container.getElementsByTagName('rect');
 					if (chartElements.length > 0) {
 						for (let i = 0; i < chartElements.length; i++) {
-							if (chartElements[i].getAttribute('x') > 0 && chartElements[i].getAttribute('x') > baseline) {
-								baseline = chartElements[i].getAttribute('x');
+							ceFloat = parseFloat(chartElements[i].getAttribute('x'));
+							
+							if (parseFloat(ceFloat) > parseFloat(0.0)) {
+								if (parseFloat(ceFloat) < parseFloat(baseline)) {
+									baseline = ceFloat;
+								}
 							}
-						};
+						}
 					}
 					
 					chartElements = container.getElementsByTagName('text');
@@ -210,7 +221,6 @@
 
 					// calculate placement
 					timelineWidth = parseFloat(timeline.getAttribute('width'));
-					//baselineBounds = baseline.getBBox();
 					timespan = dateRangeEnd.max.getTime() - dateRangeStart.min.getTime();
 					timelineUnit = (timelineWidth - baseline) / timespan;
 					markerSpan = markerDate.getTime() - dateRangeStart.min.getTime();
@@ -232,6 +242,11 @@
 					markerLine.setAttribute('stroke-width', '0');
 					markerLine.setAttribute('fill', '#e91e63');
 					svg.appendChild(markerLine);
+					
+					//DEBUG
+					console.log("Timeline width: " + parseFloat(timeline.getAttribute('width')));
+					console.log("Baseline: " + parseFloat(baseline));
+					
 				}
 						
 				google.visualization.events.addListener(chart, 'ready', function () {

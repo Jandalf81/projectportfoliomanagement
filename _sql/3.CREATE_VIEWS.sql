@@ -2,6 +2,7 @@ CREATE VIEW v_ppm AS
 SELECT
 	p.id,
 	p.nummer,
+	p.kontext,
 	p.name,
 	p.startdatum,
 	strftime('%Y, ', p.startdatum) || (strftime('%m', p.startdatum)-1) || strftime(', %d', p.startdatum) startdatum_php,
@@ -24,6 +25,7 @@ FROM
 GROUP BY
 	p.id,
 	p.nummer,
+	p.kontext,
 	p.name,
 	p.startdatum,
 	strftime('%Y, ', p.startdatum) || (strftime('%m', p.startdatum)-1) || strftime(', %d', p.startdatum),
